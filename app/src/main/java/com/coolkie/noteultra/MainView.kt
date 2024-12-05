@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -43,6 +45,7 @@ fun MainView() {
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
+  val userInput = remember { mutableStateOf("") }
 
   Surface(
     color = MaterialTheme.colorScheme.background
@@ -106,7 +109,6 @@ fun MainView() {
           }
         }
       )
-
       Box(
         modifier = Modifier
           .weight(1f)
@@ -138,8 +140,8 @@ fun MainView() {
           .background(MaterialTheme.colorScheme.surfaceContainerLow)
       ) {
         TextField(
-          value = "",
-          onValueChange = { /*TODO*/ },
+          value = userInput.value,
+          onValueChange = { userInput.value = it },
           placeholder = { Text("Enter the question") },
           modifier = Modifier
             .fillMaxSize()
@@ -147,7 +149,10 @@ fun MainView() {
             .clip(RoundedCornerShape(100.dp)),
           trailingIcon = {
             IconButton(
-              onClick = { /*TODO*/ },
+              onClick = {
+                itemsList.add(userInput.value)
+                userInput.value = ""
+              },
               modifier = Modifier
                 .padding(end = 4.dp)
                 .size(48.dp)

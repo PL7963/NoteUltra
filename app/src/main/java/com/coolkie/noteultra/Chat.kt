@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,16 +17,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+val itemsList = mutableStateListOf<String>()
+
 @Composable
 fun Chat() {
-  val itemsList = remember { mutableStateListOf<Int>() }
   val listState = rememberLazyListState()
 
   LaunchedEffect(Unit) {
@@ -34,7 +36,6 @@ fun Chat() {
       delay(1000)
       val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
       val isAtBottom = lastVisibleIndex == itemsList.size - 1
-      itemsList.add(index++)
       if (isAtBottom) {
         listState.animateScrollToItem(
           itemsList.size - 1
@@ -51,8 +52,8 @@ fun Chat() {
       state = listState,
       contentPadding = PaddingValues(12.dp)
     ) {
-      items(itemsList) { index ->
-        UserQuery("${index + 1}, Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。")
+      items(itemsList) { item ->
+        UserQuery(item)
         LlmResponse()
       }
     }
@@ -71,7 +72,9 @@ fun UserQuery(query: String) {
         .align(Alignment.TopEnd)
     ) {
       Text(
-        text = query
+        text = query,
+        modifier = Modifier
+          .align(Alignment.TopEnd)
       )
     }
   }
