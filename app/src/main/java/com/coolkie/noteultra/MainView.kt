@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,22 +18,30 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
 fun MainView() {
+  val pagerState = rememberPagerState { 2 }
+  val selectedOption = remember { mutableIntStateOf(0) }
+  val coroutineScope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
 
   Surface(
@@ -46,19 +52,15 @@ fun MainView() {
         modifier = Modifier
           .fillMaxWidth(),
         title = {
-          Box(
-            modifier = Modifier
-              .width(128.dp),
-            contentAlignment = Alignment.Center
-          ) {
-            OutlinedButton(
-              onClick = { /*TODO*/ },
-              modifier = Modifier
-                .width(64.dp)
-                .offset((-31).dp)
-                .clip(
-                  RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp)
-                ),
+          SingleChoiceSegmentedButtonRow {
+            SegmentedButton(
+              selected = selectedOption.intValue == 0,
+              onClick = {
+                selectedOption.intValue = 0
+                coroutineScope.launch {
+                  pagerState.animateScrollToPage(0)
+                }
+              },
               shape = RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp)
             ) {
               Icon(
@@ -66,19 +68,19 @@ fun MainView() {
                 contentDescription = "Grid"
               )
             }
-            OutlinedButton(
-              onClick = { /*TODO*/ },
-              modifier = Modifier
-                .width(65.dp)
-                .offset((32).dp)
-                .clip(
-                  RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp)
-                ),
+            SegmentedButton(
+              selected = selectedOption.intValue == 1,
+              onClick = {
+                selectedOption.intValue = 1
+                coroutineScope.launch {
+                  pagerState.animateScrollToPage(1)
+                }
+              },
               shape = RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp)
             ) {
               Icon(
-                painter = painterResource(id = R.drawable.rounded_article_24),
-                contentDescription = "Article"
+                painter = painterResource(R.drawable.rounded_article_24),
+                contentDescription = "Grid"
               )
             }
           }
@@ -115,7 +117,7 @@ fun MainView() {
           sheetContent = { Chat() }
         ) {
           HorizontalPager(
-            state = rememberPagerState { 2 },
+            state = pagerState,
             modifier = Modifier
               .fillMaxSize()
           ) { page ->
@@ -125,6 +127,9 @@ fun MainView() {
             }
           }
         }
+      }
+      LaunchedEffect(pagerState.currentPage) {
+        selectedOption.intValue = pagerState.currentPage
       }
       Box(
         modifier = Modifier
