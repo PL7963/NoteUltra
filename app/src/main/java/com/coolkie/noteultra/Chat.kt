@@ -29,20 +29,6 @@ val llmResponse = mutableStateListOf<String>()
 fun Chat() {
   val listState = rememberLazyListState()
 
-  LaunchedEffect(Unit) {
-    var index = 0
-    while (true) {
-      delay(1000)
-      val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-      val isAtBottom = lastVisibleIndex == itemsList.size - 1
-      if (isAtBottom) {
-        listState.animateScrollToItem(
-          itemsList.size - 1
-        )
-      }
-    }
-  }
-
   Box(
     modifier = Modifier
       .fillMaxSize()
