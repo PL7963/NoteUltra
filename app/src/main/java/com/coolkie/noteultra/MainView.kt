@@ -1,5 +1,6 @@
 package com.coolkie.noteultra
 
+import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,11 +28,12 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.utils.LlmInferenceUtils
@@ -41,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 @ExperimentalMaterial3Api
 fun MainView(llmInstance: LlmInferenceUtils) {
+  val context = LocalContext.current
   val pagerState = rememberPagerState { 2 }
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
@@ -100,7 +103,10 @@ fun MainView(llmInstance: LlmInferenceUtils) {
         },
         actions = {
           IconButton(
-            onClick = { /*TODO*/ }
+            onClick = {
+              val intent = Intent(context, SettingsActivity::class.java)
+              context.startActivity(intent)
+            }
           ) {
             Icon(
               painter = painterResource(id = R.drawable.rounded_settings_24),
