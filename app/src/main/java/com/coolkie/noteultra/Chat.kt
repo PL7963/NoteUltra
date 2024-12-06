@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 val itemsList = mutableStateListOf<String>()
+val llmResponse = mutableStateListOf<String>()
 
 @Composable
 fun Chat() {
@@ -54,7 +53,9 @@ fun Chat() {
     ) {
       items(itemsList) { item ->
         UserQuery(item)
-        LlmResponse()
+      }
+      items(llmResponse) { item ->
+        LlmResponse(item)
       }
     }
   }
@@ -81,7 +82,7 @@ fun UserQuery(query: String) {
 }
 
 @Composable
-fun LlmResponse() {
+fun LlmResponse(llmResponse: String) {
   Card(
     modifier = Modifier
       .fillMaxWidth()
@@ -94,7 +95,7 @@ fun LlmResponse() {
       Text(
         modifier = Modifier
           .padding(start = 12.dp, top = 12.dp, end = 12.dp),
-        text = "Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。"
+        text = llmResponse
       )
       Box(
         modifier = Modifier

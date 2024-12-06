@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,12 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.coolkie.noteultra.utils.LlmInferenceUtils
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
-fun MainView() {
+fun MainView(llmInstance: LlmInferenceUtils) {
   val pagerState = rememberPagerState { 2 }
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
@@ -152,6 +152,7 @@ fun MainView() {
               onClick = {
                 itemsList.add(userInput.value)
                 userInput.value = ""
+                llmResponse.add(llmInstance.answerUserQuestion())
               },
               modifier = Modifier
                 .padding(end = 4.dp)
