@@ -3,6 +3,7 @@ package com.coolkie.noteultra
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.utils.LlmInferenceUtils
@@ -48,12 +52,20 @@ fun MainView(llmInstance: LlmInferenceUtils) {
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
+  val focusManager = LocalFocusManager.current
   val userInput = remember { mutableStateOf("") }
 
   Surface(
     color = MaterialTheme.colorScheme.background
   ) {
-    Column {
+    Column(
+      modifier = Modifier
+        .pointerInput(Unit) {
+          detectTapGestures {
+            focusManager.clearFocus()
+          }
+        }
+    ) {
       CenterAlignedTopAppBar(
         modifier = Modifier
           .fillMaxWidth(),
@@ -64,6 +76,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
               onClick = {
                 selectedOption.intValue = 0
                 coroutineScope.launch {
+                  scaffoldState.bottomSheetState.partialExpand()
                   pagerState.animateScrollToPage(0)
                 }
               },
@@ -79,6 +92,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
               onClick = {
                 selectedOption.intValue = 1
                 coroutineScope.launch {
+                  scaffoldState.bottomSheetState.partialExpand()
                   pagerState.animateScrollToPage(1)
                 }
               },
@@ -152,10 +166,21 @@ fun MainView(llmInstance: LlmInferenceUtils) {
           modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(100.dp)),
+            .clip(RoundedCornerShape(100.dp))
+            .onFocusChanged { focusState ->
+              if (focusState.isFocused) {
+                coroutineScope.launch {
+                  scaffoldState.bottomSheetState.expand()
+                }
+              }
+            },
           trailingIcon = {
             IconButton(
               onClick = {
+                focusManager.clearFocus()
+                coroutineScope.launch {
+                  scaffoldState.bottomSheetState.expand()
+                }
                 userQueryList.add(userInput.value)
                 userInput.value = ""
                 llmResponseList.add(llmInstance.answerUserQuestion())
