@@ -7,27 +7,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 
-val itemsList = mutableStateListOf<String>()
-val llmResponse = mutableStateListOf<String>()
+val userQueryList = mutableStateListOf<String>()
+val llmResponseList = mutableStateListOf<String>()
 
 @Composable
 fun Chat() {
   val listState = rememberLazyListState()
+  val chatMessages = mutableListOf<Any>()
+  val maxSize = maxOf(userQueryList.size, llmResponseList.size)
 
   Box(
     modifier = Modifier
@@ -37,11 +37,25 @@ fun Chat() {
       state = listState,
       contentPadding = PaddingValues(12.dp)
     ) {
-      items(itemsList) { item ->
-        UserQuery(item)
+      for (index in 0 until maxSize) {
+        if (index < userQueryList.size) {
+          chatMessages.add(userQueryList[index])
+        }
+        if (index < llmResponseList.size) {
+          chatMessages.add(llmResponseList[index])
+        }
       }
-      items(llmResponse) { item ->
-        LlmResponse(item)
+
+      itemsIndexed(chatMessages) { _, item ->
+        when (item) {
+          is String -> {
+            if (userQueryList.contains(item)) {
+              UserQuery(item)
+            } else {
+              LlmResponse(item)
+            }
+          }
+        }
       }
     }
   }

@@ -156,9 +156,9 @@ fun MainView(llmInstance: LlmInferenceUtils) {
           trailingIcon = {
             IconButton(
               onClick = {
-                itemsList.add(userInput.value)
+                userQueryList.add(userInput.value)
                 userInput.value = ""
-                llmResponse.add(llmInstance.answerUserQuestion())
+                llmResponseList.add(llmInstance.answerUserQuestion())
               },
               modifier = Modifier
                 .padding(end = 4.dp)
