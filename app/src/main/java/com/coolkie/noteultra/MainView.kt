@@ -5,12 +5,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +19,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -55,17 +54,19 @@ fun MainView(llmInstance: LlmInferenceUtils) {
   val focusManager = LocalFocusManager.current
   val userInput = remember { mutableStateOf("") }
 
-  Surface(
-    color = MaterialTheme.colorScheme.background
-  ) {
-    Column(
-      modifier = Modifier
-        .pointerInput(Unit) {
-          detectTapGestures {
-            focusManager.clearFocus()
-          }
+  LaunchedEffect(pagerState.currentPage) {
+    selectedOption.intValue = pagerState.currentPage
+  }
+
+  Scaffold(
+    modifier = Modifier
+      .imePadding()
+      .pointerInput(Unit) {
+        detectTapGestures {
+          focusManager.clearFocus()
         }
-    ) {
+      },
+    topBar = {
       CenterAlignedTopAppBar(
         modifier = Modifier
           .fillMaxWidth(),
@@ -75,6 +76,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
               selected = selectedOption.intValue == 0,
               onClick = {
                 selectedOption.intValue = 0
+                focusManager.clearFocus()
                 coroutineScope.launch {
                   scaffoldState.bottomSheetState.partialExpand()
                   pagerState.animateScrollToPage(0)
@@ -91,6 +93,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
               selected = selectedOption.intValue == 1,
               onClick = {
                 selectedOption.intValue = 1
+                focusManager.clearFocus()
                 coroutineScope.launch {
                   scaffoldState.bottomSheetState.partialExpand()
                   pagerState.animateScrollToPage(1)
@@ -107,7 +110,9 @@ fun MainView(llmInstance: LlmInferenceUtils) {
         },
         navigationIcon = {
           IconButton(
-            onClick = { /*TODO*/ }
+            onClick = {
+              focusManager.clearFocus()
+            }
           ) {
             Icon(
               painter = painterResource(id = R.drawable.rounded_menu_24),
@@ -118,6 +123,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
         actions = {
           IconButton(
             onClick = {
+              focusManager.clearFocus()
               val intent = Intent(context, SettingsActivity::class.java)
               context.startActivity(intent)
             }
@@ -129,51 +135,30 @@ fun MainView(llmInstance: LlmInferenceUtils) {
           }
         }
       )
-      Box(
-        modifier = Modifier
-          .weight(1f)
-      ) {
-        BottomSheetScaffold(
-          scaffoldState = scaffoldState,
-          sheetPeekHeight = 48.dp,
-          sheetContent = { Chat() }
-        ) {
-          HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-              .fillMaxSize()
-          ) { page ->
-            when (page) {
-              0 -> ListView()
-              1 -> TimeView()
-            }
-          }
-        }
-      }
-      LaunchedEffect(pagerState.currentPage) {
-        selectedOption.intValue = pagerState.currentPage
-      }
+    },
+    bottomBar = {
       Box(
         modifier = Modifier
           .fillMaxWidth()
-          .height(56.dp)
+          .heightIn(56.dp)
           .background(MaterialTheme.colorScheme.surfaceContainerLow)
+          .onFocusChanged { focusState ->
+            if (focusState.isFocused) {
+              coroutineScope.launch {
+                scaffoldState.bottomSheetState.expand()
+              }
+            }
+          }
       ) {
         TextField(
           value = userInput.value,
           onValueChange = { userInput.value = it },
           placeholder = { Text("Enter the question") },
           modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(100.dp))
-            .onFocusChanged { focusState ->
-              if (focusState.isFocused) {
-                coroutineScope.launch {
-                  scaffoldState.bottomSheetState.expand()
-                }
-              }
-            },
+            .clip(RoundedCornerShape(28.dp)),
+          maxLines = 4,
           trailingIcon = {
             IconButton(
               onClick = {
@@ -187,7 +172,6 @@ fun MainView(llmInstance: LlmInferenceUtils) {
               },
               modifier = Modifier
                 .padding(end = 4.dp)
-                .size(48.dp)
             ) {
               Icon(
                 painter = painterResource
@@ -197,6 +181,28 @@ fun MainView(llmInstance: LlmInferenceUtils) {
             }
           }
         )
+      }
+    }
+  ) { innerPadding ->
+    Box(
+      modifier = Modifier
+        .padding(innerPadding)
+    ) {
+      BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 48.dp,
+        sheetContent = { Chat() }
+      ) {
+        HorizontalPager(
+          state = pagerState,
+          modifier = Modifier
+            .fillMaxSize()
+        ) { page ->
+          when (page) {
+            0 -> ListView()
+            1 -> TimeView()
+          }
+        }
       }
     }
   }

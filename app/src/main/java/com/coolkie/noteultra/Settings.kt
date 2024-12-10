@@ -8,14 +8,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -32,10 +31,8 @@ class SettingsActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       NoteUltraTheme {
-        Surface(
-          color = MaterialTheme.colorScheme.background
-        ) {
-          Column {
+        Scaffold(
+          topBar = {
             TopAppBar(
               modifier = Modifier
                 .fillMaxWidth(),
@@ -51,34 +48,33 @@ class SettingsActivity : ComponentActivity() {
                 }
               }
             )
-            Box(
-              modifier = Modifier
-                .fillMaxSize()
-            ) {
-              Column {
-                SettingCategory("App Settings")
-                SwitchOption(
-                  "Press to note",
-                  "Transcribing in real-time can be performance hungry. Press to note only records voices when you hold your phone firmly\n" +
-                          "*Requires pressure sensor ",
-                  false
-                )
-                SettingCategory("AI Settings")
-                DialogOption(
-                  "LLM Models",
-                  "LLM Models setting define which Large Language model proccess your text input"
-                )
-                SettingCategory("Other")
-                DialogOption(
-                  "Dark mode",
-                  "Change color scheme for this app"
-                )
-                DialogOption(
-                  "Clear data",
-                  "WARNING: Clear data will clear all the conversation you recorded. This is irreversible!"
-                )
-              }
-            }
+          }
+        ) { innerPadding ->
+          Column(
+            modifier = Modifier
+              .padding(innerPadding)
+          ) {
+            SettingCategory("App Settings")
+            SwitchOption(
+              "Press to note",
+              "Transcribing in real-time can be performance hungry. Press to note only records voices when you hold your phone firmly\n" +
+                      "*Requires pressure sensor ",
+              false
+            )
+            SettingCategory("AI Settings")
+            DialogOption(
+              "LLM Models",
+              "LLM Models setting define which Large Language model proccess your text input"
+            )
+            SettingCategory("Other")
+            DialogOption(
+              "Dark mode",
+              "Change color scheme for this app"
+            )
+            DialogOption(
+              "Clear data",
+              "WARNING: Clear data will clear all the conversation you recorded. This is irreversible!"
+            )
           }
         }
       }
