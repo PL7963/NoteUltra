@@ -1,5 +1,6 @@
 package com.coolkie.noteultra
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,10 +11,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,10 +48,15 @@ fun ListView() {
 
 @Composable
 fun ProduceCard(title: String, content: String) {
+  val showDialog = remember { mutableStateOf(false) }
+
   Card(
     modifier = Modifier
       .padding(3.dp)
       .aspectRatio(1f)
+      .clickable{
+        showDialog.value = true
+      }
   ) {
     Column(
       modifier = Modifier
@@ -61,5 +73,30 @@ fun ProduceCard(title: String, content: String) {
         style = MaterialTheme.typography.titleMedium
       )
     }
+  }
+
+  if (showDialog.value) {
+    AlertDialog(
+      onDismissRequest = { showDialog.value = false },
+      title = { Text(title) },
+      text = {
+        Column(
+          modifier = Modifier
+            .verticalScroll(rememberScrollState())
+        ) {
+          Text(
+            text = content,
+            style = MaterialTheme.typography.bodyLarge
+          )
+        }
+      },
+      confirmButton = {
+        Button(
+          onClick = { showDialog.value = false }
+        ) {
+          Text("close")
+        }
+      }
+    )
   }
 }
