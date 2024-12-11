@@ -162,13 +162,15 @@ fun MainView(llmInstance: LlmInferenceUtils) {
           trailingIcon = {
             IconButton(
               onClick = {
-                focusManager.clearFocus()
-                coroutineScope.launch {
-                  scaffoldState.bottomSheetState.expand()
+                if (userInput.value.isNotEmpty()) {
+                  focusManager.clearFocus()
+                  coroutineScope.launch {
+                    scaffoldState.bottomSheetState.expand()
+                  }
+                  userQueryList.add(userInput.value)
+                  userInput.value = ""
+                  llmResponseList.add(llmInstance.answerUserQuestion())
                 }
-                userQueryList.add(userInput.value)
-                userInput.value = ""
-                llmResponseList.add(llmInstance.answerUserQuestion())
               },
               modifier = Modifier
                 .padding(end = 4.dp)
