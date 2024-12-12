@@ -33,12 +33,12 @@ jobs:
 
     - name: Rename APK
       run: |
-        mv "$APK_FILE" app/build/outputs/apk/debug/meowmeow.apk
-        echo "RENAMED_APK=app/build/outputs/apk/debug/meowmeow.apk" >> $GITHUB_ENV
+        mv "$APK_FILE" app/build/outputs/apk/debug/NoteUltra.apk
+        echo "RENAMED_APK=app/build/outputs/apk/debug/NoteUltra.apk" >> $GITHUB_ENV
 
     - name: Upload APK as Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: meowmeow
+        name: NoteUltra
         path: ${{ env.RENAMED_APK }}
         retention-days: 5
