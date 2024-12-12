@@ -25,3 +25,16 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Find APKs
+      run: |
+        APK_FILE=$(find app/build/outputs/apk -name '*.apk')
+        echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
+        echo "APK_FILE_NAME=$(basename $APK_FILE .apk)" >> $GITHUB_ENV
+
+    - name: Upload APKs to Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.APK_FILE_NAME }}
+        path: ${{ env.APK_FILE }}
+        retention-days: 5
