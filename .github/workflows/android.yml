@@ -28,9 +28,10 @@ jobs:
 
     - name: Find APKs
       run: |
-        APK_FILE=$(find app/build/outputs/apk -name '*.apk')
+        APK_FILE=$(find app/build/outputs/apk/debug -name '*.apk' | head -n 1)
         echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
-        echo "APK_FILE_NAME=$(basename $APK_FILE .apk)" >> $GITHUB_ENV
+        APK_FILE_NAME=$(basename "$APK_FILE")
+        echo "APK_FILE_NAME=$APK_FILE_NAME" >> $GITHUB_ENV
 
     - name: Upload APKs to Artifacts
       uses: actions/upload-artifact@v4
