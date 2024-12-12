@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
+import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 

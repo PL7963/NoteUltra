@@ -1,4 +1,4 @@
-package com.coolkie.noteultra
+package com.coolkie.noteultra.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.coolkie.noteultra.R
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 
 class SettingsActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package com.coolkie.noteultra
+package com.coolkie.noteultra.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.coolkie.noteultra.R
 
 val userQueryList = mutableStateListOf<String>()
 val llmResponseList = mutableStateListOf<String>()

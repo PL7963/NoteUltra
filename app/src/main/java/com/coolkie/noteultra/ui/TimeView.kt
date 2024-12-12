@@ -1,4 +1,4 @@
-package com.coolkie.noteultra
+package com.coolkie.noteultra.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues

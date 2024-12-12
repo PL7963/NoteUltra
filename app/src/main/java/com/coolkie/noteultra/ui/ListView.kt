@@ -1,4 +1,4 @@
-package com.coolkie.noteultra
+package com.coolkie.noteultra.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

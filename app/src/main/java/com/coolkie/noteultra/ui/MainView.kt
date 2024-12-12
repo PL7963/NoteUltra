@@ -1,4 +1,4 @@
-package com.coolkie.noteultra
+package com.coolkie.noteultra.ui
 
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.coolkie.noteultra.R
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 import kotlinx.coroutines.launch
 
