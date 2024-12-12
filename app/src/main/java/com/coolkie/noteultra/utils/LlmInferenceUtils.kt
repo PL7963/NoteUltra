@@ -1,8 +1,8 @@
 package com.coolkie.noteultra.utils
 
 import android.content.Context
-import com.coolkie.noteultra.llmResponseList
-import com.coolkie.noteultra.userQueryList
+import com.coolkie.noteultra.ui.llmResponseList
+import com.coolkie.noteultra.ui.userQueryList
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 
 class LlmInferenceUtils(context: Context) {
