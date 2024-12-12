@@ -20,12 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
+import com.coolkie.noteultra.data.NoteViewModel
 
 val userQueryList = mutableStateListOf<String>()
 val llmResponseList = mutableStateListOf<String>()
 
 @Composable
-fun Chat() {
+fun Chat(noteViewModel: NoteViewModel) {
   val listState = rememberLazyListState()
   val chatMessages = mutableListOf<Any>()
   val maxSize = maxOf(userQueryList.size, llmResponseList.size)
@@ -53,7 +54,7 @@ fun Chat() {
             if (userQueryList.contains(item)) {
               UserQuery(item)
             } else {
-              LlmResponse(item)
+              LlmResponse(item, noteViewModel)
             }
           }
         }
@@ -83,7 +84,7 @@ fun UserQuery(query: String) {
 }
 
 @Composable
-fun LlmResponse(llmResponse: String) {
+fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel) {
   Card(
     modifier = Modifier
       .fillMaxWidth()
@@ -103,7 +104,13 @@ fun LlmResponse(llmResponse: String) {
           .fillMaxWidth()
       ) {
         IconButton(
-          onClick = { /* todo */ },
+          onClick = {
+            noteViewModel.addNote(
+              "Note Title",
+              "Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。",
+              System.currentTimeMillis()
+            )
+          },
           modifier = Modifier
             .align(Alignment.TopEnd)
         ) {

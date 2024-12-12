@@ -40,13 +40,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
+import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
-fun MainView(llmInstance: LlmInferenceUtils) {
+fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
   val context = LocalContext.current
   val pagerState = rememberPagerState { 2 }
   val selectedOption = remember { mutableIntStateOf(0) }
@@ -194,7 +195,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
       BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 48.dp,
-        sheetContent = { Chat() }
+        sheetContent = { Chat(noteViewModel) }
       ) {
         HorizontalPager(
           state = pagerState,
@@ -202,7 +203,7 @@ fun MainView(llmInstance: LlmInferenceUtils) {
             .fillMaxSize()
         ) { page ->
           when (page) {
-            0 -> ListView()
+            0 -> ListView(noteViewModel)
             1 -> TimeView()
           }
         }
