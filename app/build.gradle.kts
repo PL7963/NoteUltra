@@ -53,8 +53,8 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.androidx.room.ktx)
-    implementation (libs.androidx.room.runtime)
-    kapt ("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.room.runtime)
+    kapt("androidx.room:room-compiler:2.6.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -65,4 +65,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("com.google.mediapipe:tasks-genai:0.10.18")
+    implementation("com.google.mediapipe:tasks-text:latest.release")
 }
