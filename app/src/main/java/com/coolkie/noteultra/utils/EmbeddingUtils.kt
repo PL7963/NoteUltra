@@ -26,7 +26,11 @@ class EmbeddingUtils(
         textEmbedder = TextEmbedder.createFromOptions(context, options)
     }
 
-    fun embedText(input: String) {
-
+    fun embedText(input: String): FloatArray? {
+        textEmbedder?.let {
+            val embeddedResult = it.embed(input).embeddingResult().embeddings().first()
+            return embeddedResult.floatEmbedding()
+        }
+        return null
     }
 }
