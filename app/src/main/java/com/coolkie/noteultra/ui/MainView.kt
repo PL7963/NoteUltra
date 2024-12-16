@@ -42,7 +42,9 @@ import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.utils.LlmInferenceUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -77,11 +79,16 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
             SegmentedButton(
               selected = selectedOption.intValue == 0,
               onClick = {
-                selectedOption.intValue = 0
-                focusManager.clearFocus()
                 coroutineScope.launch {
-                  scaffoldState.bottomSheetState.partialExpand()
-                  pagerState.animateScrollToPage(0)
+                  launch {
+                    focusManager.clearFocus()
+                  }
+                  launch {
+                    scaffoldState.bottomSheetState.partialExpand()
+                  }
+                  launch {
+                    pagerState.animateScrollToPage(0)
+                  }
                 }
               },
               shape = RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp)
@@ -94,11 +101,16 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
             SegmentedButton(
               selected = selectedOption.intValue == 1,
               onClick = {
-                selectedOption.intValue = 1
-                focusManager.clearFocus()
                 coroutineScope.launch {
-                  scaffoldState.bottomSheetState.partialExpand()
-                  pagerState.animateScrollToPage(1)
+                  launch {
+                    focusManager.clearFocus()
+                  }
+                  launch {
+                    scaffoldState.bottomSheetState.partialExpand()
+                  }
+                  launch {
+                    pagerState.animateScrollToPage(1)
+                  }
                 }
               },
               shape = RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp)
@@ -165,13 +177,21 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
             IconButton(
               onClick = {
                 if (userInput.value.isNotEmpty()) {
-                  focusManager.clearFocus()
-                  coroutineScope.launch {
-                    scaffoldState.bottomSheetState.expand()
-                  }
                   userQueryList.add(userInput.value)
-                  userInput.value = ""
-                  llmResponseList.add(llmInstance.answerUserQuestion())
+                  coroutineScope.launch {
+                    launch {
+                      focusManager.clearFocus()
+                    }
+                    launch {
+                      scaffoldState.bottomSheetState.expand()
+                    }
+                    launch {
+                      llmResponseList.add(
+                        withContext(Dispatchers.IO) { llmInstance.answerUserQuestion() }
+                      )
+                    }
+                    userInput.value = ""
+                  }
                 }
               },
               modifier = Modifier
