@@ -170,6 +170,7 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
           placeholder = { Text("Enter the question") },
           modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 8.dp)
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(28.dp)),
           maxLines = 4,
@@ -214,7 +215,7 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
     ) {
       BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 48.dp,
+        sheetPeekHeight = 40.dp,
         sheetContent = { Chat(noteViewModel) }
       ) {
         HorizontalPager(
