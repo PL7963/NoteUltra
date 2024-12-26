@@ -19,6 +19,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -65,7 +66,7 @@ class SettingsActivity : ComponentActivity() {
             SettingCategory("AI Settings")
             DialogOption(
               "LLM Models",
-              "LLM Models setting define which Large Language model proccess your text input"
+              "LLM Models setting define which Large Language model process your text input"
             )
             SettingCategory("Other")
             DialogOption(
@@ -87,8 +88,7 @@ class SettingsActivity : ComponentActivity() {
 fun SettingCategory(text: String) {
   Text(
     modifier = Modifier
-      .padding(top = 6.dp)
-      .padding(horizontal = 32.dp),
+      .padding(horizontal = 32.dp, vertical = 12.dp),
     style = MaterialTheme.typography.labelMedium,
     color = MaterialTheme.colorScheme.primary,
     text = text
@@ -98,14 +98,14 @@ fun SettingCategory(text: String) {
 @Composable
 fun SwitchOption(title: String, subtitle: String, boolean: Boolean) {
   Row(
+    verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier
       .fillMaxWidth()
-      .padding(vertical = 6.dp)
       .clickable {}
   ) {
     Column(
       modifier = Modifier
-        .padding(horizontal = 32.dp, vertical = 4.dp)
+        .padding(horizontal = 32.dp, vertical = 12.dp)
         .weight(1f)
     ) {
       Text(
@@ -131,14 +131,14 @@ fun SwitchOption(title: String, subtitle: String, boolean: Boolean) {
 @Composable
 fun DialogOption(title: String, subtitle: String) {
   Box(
+    contentAlignment = Alignment.CenterStart,
     modifier = Modifier
       .fillMaxWidth()
-      .padding(vertical = 6.dp)
       .clickable {}
   ) {
     Column(
       modifier = Modifier
-        .padding(horizontal = 32.dp, vertical = 4.dp)
+        .padding(horizontal = 32.dp, vertical = 12.dp)
     ) {
       Text(
         style = MaterialTheme.typography.bodyLarge,
