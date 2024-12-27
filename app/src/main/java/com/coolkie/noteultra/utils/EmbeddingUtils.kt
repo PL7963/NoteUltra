@@ -2,6 +2,7 @@ package com.coolkie.noteultra.utils
 
 import android.content.Context
 import com.google.mediapipe.tasks.core.BaseOptions
+import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.text.textembedder.TextEmbedder
 import com.google.mediapipe.tasks.text.textembedder.TextEmbedder.TextEmbedderOptions
 
@@ -14,14 +15,16 @@ class EmbeddingUtils(
         setupTextEmbedder()
     }
 
+
     fun setupTextEmbedder() {
         var embeddingModel = "models/embedding/universal_sentence_encoder.tflite"
-        val baseOptionsBuilder = BaseOptions.builder()
-
-        baseOptionsBuilder.setModelAssetPath(embeddingModel)
-
-        val baseOptions = baseOptionsBuilder.build()
-        val optionsBuilder = TextEmbedderOptions.builder().setBaseOptions(baseOptions)
+        val baseOptions = BaseOptions
+            .builder()
+            .setModelAssetPath(embeddingModel)
+            .setDelegate(Delegate.GPU)
+            .build()
+        val optionsBuilder =
+            TextEmbedderOptions.builder().setBaseOptions(baseOptions)
         val options = optionsBuilder.build()
         textEmbedder = TextEmbedder.createFromOptions(context, options)
     }
