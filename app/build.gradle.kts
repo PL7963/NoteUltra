@@ -54,6 +54,7 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.datastore.preferences)
     kapt("androidx.room:room-compiler:2.6.1")
 
     testImplementation(libs.junit)
