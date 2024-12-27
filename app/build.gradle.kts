@@ -66,5 +66,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("com.google.mediapipe:tasks-genai:0.10.18")
-    implementation("com.google.mediapipe:tasks-text:latest.release")
+    implementation("com.google.mediapipe:tasks-text:0.10.15")
 }
