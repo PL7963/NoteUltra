@@ -16,7 +16,6 @@ class VectorUtils(private val box: Box<ChatHistory>) {
         ).build()
 
         val results = query.find()
-        Log.d("VectorUtils", "[+] Found results: ${results.map { it.content }}")
         return results.map { it.content }
     }
 
@@ -29,5 +28,18 @@ class VectorUtils(private val box: Box<ChatHistory>) {
                 contentVector = vector
             )
         )
+    }
+
+    fun searchDateAllContent(date: LocalDate): List<String> {
+        val epochDay = date.toEpochDay().toInt()
+        val query = box.query(ChatHistory_.date.equal(epochDay)).build()
+        val results = query.find()
+        return results.map { it.content }
+    }
+
+    fun searchAllDate(): List<LocalDate> {
+        val query = box.query().build()
+        val results = query.find()
+        return results.map { it.date }
     }
 }
