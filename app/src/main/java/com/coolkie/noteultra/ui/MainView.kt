@@ -15,16 +15,19 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,17 +43,28 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
+import com.coolkie.noteultra.data.ChatHistory
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.utils.LlmInferenceUtils
+import com.coolkie.noteultra.utils.VectorUtils
+import io.objectbox.Box
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
-fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
+fun MainView(
+  llmInstance: LlmInferenceUtils,
+  chatHistoryBox: Box<ChatHistory>,
+  noteViewModel: NoteViewModel
+) {
+  val currentDate = remember { mutableStateOf(LocalDate.now()) }
+  val dates = VectorUtils(chatHistoryBox).searchAllDate()
   val context = LocalContext.current
+  val drawerState = rememberDrawerState(DrawerValue.Closed)
   val pagerState = rememberPagerState { 2 }
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
@@ -61,171 +75,188 @@ fun MainView(llmInstance: LlmInferenceUtils, noteViewModel: NoteViewModel) {
   LaunchedEffect(pagerState.currentPage) {
     selectedOption.intValue = pagerState.currentPage
   }
-
-  Scaffold(
-    modifier = Modifier
-      .imePadding()
-      .pointerInput(Unit) {
-        detectTapGestures {
-          focusManager.clearFocus()
-        }
-      },
-    topBar = {
-      CenterAlignedTopAppBar(
-        modifier = Modifier
-          .fillMaxWidth(),
-        title = {
-          SingleChoiceSegmentedButtonRow {
-            SegmentedButton(
-              selected = selectedOption.intValue == 0,
-              onClick = {
-                coroutineScope.launch {
-                  launch {
-                    focusManager.clearFocus()
-                  }
-                  launch {
-                    scaffoldState.bottomSheetState.partialExpand()
-                  }
-                  launch {
-                    pagerState.animateScrollToPage(0)
-                  }
-                }
-              },
-              shape = RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp)
-            ) {
-              Icon(
-                painter = painterResource(id = R.drawable.rounded_grid_view_24),
-                contentDescription = "Grid"
-              )
-            }
-            SegmentedButton(
-              selected = selectedOption.intValue == 1,
-              onClick = {
-                coroutineScope.launch {
-                  launch {
-                    focusManager.clearFocus()
-                  }
-                  launch {
-                    scaffoldState.bottomSheetState.partialExpand()
-                  }
-                  launch {
-                    pagerState.animateScrollToPage(1)
-                  }
-                }
-              },
-              shape = RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp)
-            ) {
-              Icon(
-                painter = painterResource(R.drawable.rounded_article_24),
-                contentDescription = "Grid"
-              )
-            }
-          }
-        },
-        navigationIcon = {
-          IconButton(
-            onClick = {
-              focusManager.clearFocus()
-            }
-          ) {
-            Icon(
-              painter = painterResource(id = R.drawable.rounded_menu_24),
-              contentDescription = "Menu"
-            )
-          }
-        },
-        actions = {
-          IconButton(
-            onClick = {
-              focusManager.clearFocus()
-              val intent = Intent(context, SettingsActivity::class.java)
-              context.startActivity(intent)
-            }
-          ) {
-            Icon(
-              painter = painterResource(id = R.drawable.rounded_settings_24),
-              contentDescription = "Settings"
-            )
-          }
-        }
-      )
+  ModalNavigationDrawer(
+    drawerContent = {
+      HistorySheet(dates, currentDate, drawerState)
     },
-    bottomBar = {
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .heightIn(56.dp)
-          .background(MaterialTheme.colorScheme.surfaceContainerLow)
-          .onFocusChanged { focusState ->
-            if (focusState.isFocused) {
-              coroutineScope.launch {
-                scaffoldState.bottomSheetState.expand()
-              }
-            }
+    drawerState = drawerState
+  ) {
+    Scaffold(
+      modifier = Modifier
+        .imePadding()
+        .pointerInput(Unit) {
+          detectTapGestures {
+            focusManager.clearFocus()
           }
-      ) {
-        TextField(
-          value = userInput.value,
-          onValueChange = { userInput.value = it },
-          placeholder = { Text("Enter the question") },
+        },
+      topBar = {
+        CenterAlignedTopAppBar(
           modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(28.dp)),
-          maxLines = 4,
-          trailingIcon = {
-            IconButton(
-              onClick = {
-                if (userInput.value.isNotEmpty()) {
-                  userQueryList.add(userInput.value)
+            .fillMaxWidth(),
+          title = {
+            SingleChoiceSegmentedButtonRow {
+              SegmentedButton(
+                selected = selectedOption.intValue == 0,
+                onClick = {
                   coroutineScope.launch {
                     launch {
                       focusManager.clearFocus()
                     }
                     launch {
-                      scaffoldState.bottomSheetState.expand()
+                      scaffoldState.bottomSheetState.partialExpand()
                     }
                     launch {
-                      llmResponseList.add(
-                        withContext(Dispatchers.IO) { llmInstance.answerUserQuestion() }
-                      )
+                      pagerState.animateScrollToPage(0)
                     }
-                    userInput.value = ""
+
+                  }
+                },
+                shape = RoundedCornerShape(100.dp, 0.dp, 0.dp, 100.dp)
+              ) {
+                Icon(
+                  painter = painterResource(id = R.drawable.rounded_grid_view_24),
+                  contentDescription = "Grid"
+                )
+              }
+              SegmentedButton(
+                selected = selectedOption.intValue == 1,
+                onClick = {
+                  coroutineScope.launch {
+                    launch {
+                      focusManager.clearFocus()
+                    }
+                    launch {
+                      scaffoldState.bottomSheetState.partialExpand()
+                    }
+                    launch {
+                      pagerState.animateScrollToPage(1)
+                    }
+                  }
+                },
+                shape = RoundedCornerShape(0.dp, 100.dp, 100.dp, 0.dp)
+              ) {
+                Icon(
+                  painter = painterResource(R.drawable.rounded_article_24),
+                  contentDescription = "Grid"
+                )
+              }
+            }
+          },
+          navigationIcon = {
+            IconButton(
+              onClick = {
+                coroutineScope.launch {
+                  launch {
+                    focusManager.clearFocus()
+                  }
+                  launch {
+                    scaffoldState.bottomSheetState.partialExpand()
+                  }
+                  launch {
+                    drawerState.open()
                   }
                 }
-              },
-              modifier = Modifier
-                .padding(end = 4.dp)
+              }
             ) {
               Icon(
-                painter = painterResource
-                  (id = R.drawable.rounded_send_24),
-                contentDescription = "Send"
+                painter = painterResource(id = R.drawable.rounded_menu_24),
+                contentDescription = "Menu"
+              )
+            }
+          },
+          actions = {
+            IconButton(
+              onClick = {
+                focusManager.clearFocus()
+                val intent = Intent(context, SettingsActivity::class.java)
+                context.startActivity(intent)
+              }
+            ) {
+              Icon(
+                painter = painterResource(id = R.drawable.rounded_settings_24),
+                contentDescription = "Settings"
               )
             }
           }
         )
-      }
-    }
-  ) { innerPadding ->
-    Box(
-      modifier = Modifier
-        .padding(innerPadding)
-    ) {
-      BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 40.dp,
-        sheetContent = { Chat(noteViewModel) }
-      ) {
-        HorizontalPager(
-          state = pagerState,
+      },
+      bottomBar = {
+        Box(
           modifier = Modifier
-            .fillMaxSize()
-        ) { page ->
-          when (page) {
-            0 -> ListView(noteViewModel)
-            1 -> TimeView()
+            .fillMaxWidth()
+            .heightIn(56.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .onFocusChanged { focusState ->
+              if (focusState.isFocused) {
+                coroutineScope.launch {
+                  scaffoldState.bottomSheetState.expand()
+                }
+              }
+            }
+        ) {
+          TextField(
+            value = userInput.value,
+            onValueChange = { userInput.value = it },
+            placeholder = { Text("Enter the question") },
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(top = 8.dp)
+              .padding(horizontal = 16.dp)
+              .clip(RoundedCornerShape(28.dp)),
+            maxLines = 4,
+            trailingIcon = {
+              IconButton(
+                onClick = {
+                  if (userInput.value.isNotEmpty()) {
+                    userQueryList.add(userInput.value)
+                    coroutineScope.launch {
+                      launch {
+                        focusManager.clearFocus()
+                      }
+                      launch {
+                        scaffoldState.bottomSheetState.expand()
+                      }
+                      launch {
+                        llmResponseList.add(
+                          withContext(Dispatchers.IO) { llmInstance.answerUserQuestion() }
+                        )
+                      }
+                      userInput.value = ""
+                    }
+                  }
+                },
+                modifier = Modifier
+                  .padding(end = 4.dp)
+              ) {
+                Icon(
+                  painter = painterResource
+                    (id = R.drawable.rounded_send_24),
+                  contentDescription = "Send"
+                )
+              }
+            }
+          )
+        }
+      }
+    ) { innerPadding ->
+      Box(
+        modifier = Modifier
+          .padding(innerPadding)
+      ) {
+        BottomSheetScaffold(
+          scaffoldState = scaffoldState,
+          sheetPeekHeight = 40.dp,
+          sheetContent = { Chat(noteViewModel) }
+        ) {
+          HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+              .fillMaxSize()
+          ) { page ->
+            when (page) {
+              0 -> ListView(noteViewModel)
+              1 -> TimeView()
+            }
           }
         }
       }
