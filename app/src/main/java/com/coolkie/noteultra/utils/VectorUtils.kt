@@ -1,6 +1,5 @@
 package com.coolkie.noteultra.utils
 
-import android.util.Log
 import com.coolkie.noteultra.data.ChatHistory
 import com.coolkie.noteultra.data.ChatHistory_
 import io.objectbox.Box
@@ -40,6 +39,6 @@ class VectorUtils(private val box: Box<ChatHistory>) {
     fun searchAllDate(): List<LocalDate> {
         val query = box.query().build()
         val results = query.find()
-        return results.map { it.date }
+        return results.map { it.date }.distinct()
     }
 }
