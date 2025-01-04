@@ -15,11 +15,13 @@ import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.LlmInferenceUtils
+import com.coolkie.noteultra.utils.asr.VoiceRecognition
 import io.objectbox.BoxStore
 
 class MainActivity : ComponentActivity() {
   private lateinit var llmInstance: LlmInferenceUtils
   private lateinit var textEmbeddingUtils: EmbeddingUtils
+  private lateinit var voiceRecognition: VoiceRecognition
   private val noteViewModel: NoteViewModel by viewModels {
     NoteViewModelFactory(NotesDatabase.getDatabase(applicationContext))
   }
@@ -34,6 +36,8 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     llmInstance = LlmInferenceUtils(this)
     textEmbeddingUtils = EmbeddingUtils(this)
+    voiceRecognition = VoiceRecognition(this)
+    voiceRecognition.initModel(this)
     enableEdgeToEdge()
     setContent {
       NoteUltraTheme {
