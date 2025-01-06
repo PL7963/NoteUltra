@@ -9,6 +9,8 @@ import androidx.core.app.ActivityCompat
 import android.content.Context
 import android.media.AudioFormat
 import android.media.MediaRecorder
+import com.coolkie.noteultra.utils.EmbeddingUtils
+import com.coolkie.noteultra.utils.VectorUtils
 import kotlin.concurrent.thread
 import com.k2fsa.sherpa.ncnn.SherpaNcnn
 import com.k2fsa.sherpa.ncnn.getFeatureExtractorConfig
@@ -16,7 +18,7 @@ import com.k2fsa.sherpa.ncnn.getModelConfig
 import com.k2fsa.sherpa.ncnn.getDecoderConfig
 import com.k2fsa.sherpa.ncnn.RecognizerConfig
 
-class VoiceRecognition(context: Context) {
+class VoiceRecognition(context: Context, vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils) {
   private val permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
 
   private lateinit var model: SherpaNcnn
@@ -26,6 +28,9 @@ class VoiceRecognition(context: Context) {
   private val sampleRateInHz = 16000
   private val channelConfig = AudioFormat.CHANNEL_IN_MONO
   private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+
+  private val embeddingUtil = embeddingUtils
+  private val vectorUtil = vectorUtils
 
   @Volatile
   private var isRecording: Boolean = false
@@ -51,11 +56,10 @@ class VoiceRecognition(context: Context) {
   }
 
   private fun processSamples() {
-    val interval = 0.1
+    val interval = 0.3
     val bufferSize = (interval * sampleRateInHz).toInt() // in samples
     val buffer = ShortArray(bufferSize)
-    var fullText = ""
-    Log.d("SherpaNcnn", "${isRecording}")
+    Log.d("SherpaNcnn", "Is recording: ${isRecording}")
     while (isRecording) {
       val ret = audioRecord?.read(buffer, 0, buffer.size)
       if (ret != null && ret > 0) {
@@ -67,13 +71,11 @@ class VoiceRecognition(context: Context) {
         val isEndpoint = model.isEndpoint()
         val text = model.text
 
-        if (text.isNotBlank()) {
-          fullText = "${fullText} ${text}"
-        }
         if (isEndpoint) {
           model.reset()
-          Log.d("SherpaNcnn", "FullText: $fullText")
-          fullText = ""
+          if (text.isNotBlank()) {
+            embeddingUtil.embedText(text)?.let { vectorUtil.store(text, it) }
+          }
         }
       }
     }

@@ -38,8 +38,9 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     llmInstance = LlmInferenceUtils(this)
     textEmbeddingUtils = EmbeddingUtils(this)
-    voiceRecognition = VoiceRecognition(this)
+    voiceRecognition = VoiceRecognition(this, vectorUtils, textEmbeddingUtils)
     voiceRecognition.initModel(this)
+    voiceRecognition.startRecording(this)
     enableEdgeToEdge()
     setContent {
       NoteUltraTheme {

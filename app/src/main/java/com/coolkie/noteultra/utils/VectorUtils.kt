@@ -28,11 +28,11 @@ class VectorUtils(private val box: Box<ChatHistory>) {
         return results.map { it.content }
     }
 
-    fun store(date: LocalDate, time: LocalTime, content: String, vector: FloatArray) {
+    fun store(content: String, vector: FloatArray) {
         box.put(
             ChatHistory(
-                date = date,
-                time = time,
+                date = LocalDate.now(),
+                time = LocalTime.now(),
                 content = content,
                 contentVector = vector
             )
