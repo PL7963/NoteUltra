@@ -15,6 +15,7 @@ import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.LlmInferenceUtils
+import com.coolkie.noteultra.utils.VectorUtils
 import com.coolkie.noteultra.utils.asr.VoiceRecognition
 import io.objectbox.BoxStore
 
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
     // ObjectBox initialization
     val boxStore: BoxStore = MyObjectBox.builder().androidContext(this).build()
     val chatHistoryBox = boxStore.boxFor(ChatHistory::class.java)
+    val vectorUtils = VectorUtils(chatHistoryBox)
 
     super.onCreate(savedInstanceState)
     llmInstance = LlmInferenceUtils(this)
@@ -41,7 +43,7 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       NoteUltraTheme {
-        MainView(llmInstance, chatHistoryBox, noteViewModel)
+        MainView(llmInstance, vectorUtils, noteViewModel)
       }
     }
   }

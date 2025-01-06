@@ -43,26 +43,21 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
-import com.coolkie.noteultra.data.ChatHistory
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 import com.coolkie.noteultra.utils.VectorUtils
-import io.objectbox.Box
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
 fun MainView(
   llmInstance: LlmInferenceUtils,
-  chatHistoryBox: Box<ChatHistory>,
+  vectorUtils: VectorUtils,
   noteViewModel: NoteViewModel
 ) {
-  val currentDate = remember { mutableStateOf(LocalDate.now()) }
-  val dates = VectorUtils(chatHistoryBox).searchAllDate()
   val context = LocalContext.current
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val pagerState = rememberPagerState { 2 }
@@ -77,7 +72,7 @@ fun MainView(
   }
   ModalNavigationDrawer(
     drawerContent = {
-      HistorySheet(dates, currentDate, drawerState)
+      HistorySheet(vectorUtils, drawerState)
     },
     drawerState = drawerState
   ) {
@@ -255,7 +250,7 @@ fun MainView(
           ) { page ->
             when (page) {
               0 -> ListView(noteViewModel)
-              1 -> TimeView()
+              1 -> TimeView(vectorUtils)
             }
           }
         }

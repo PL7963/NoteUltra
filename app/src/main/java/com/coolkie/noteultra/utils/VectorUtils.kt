@@ -1,5 +1,6 @@
 package com.coolkie.noteultra.utils
 
+import androidx.compose.runtime.mutableStateOf
 import com.coolkie.noteultra.data.ChatHistory
 import com.coolkie.noteultra.data.ChatHistory_
 import io.objectbox.Box
@@ -7,6 +8,15 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class VectorUtils(private val box: Box<ChatHistory>) {
+    val currentDate = mutableStateOf(LocalDate.now())
+    val allDates = mutableStateOf<List<LocalDate>>(emptyList())
+    val dateAllContent = mutableStateOf<List<String>>(emptyList())
+
+    init {
+        updateDateAllContent()
+        updateAllDate()
+    }
+
     fun search(date: LocalDate, vector: FloatArray): List<String> {
         val epochDay = date.toEpochDay().toInt()
         val query = box.query(
@@ -27,18 +37,25 @@ class VectorUtils(private val box: Box<ChatHistory>) {
                 contentVector = vector
             )
         )
+        updateDateAllContent()
+        updateAllDate()
     }
 
-    fun searchDateAllContent(date: LocalDate): List<String> {
-        val epochDay = date.toEpochDay().toInt()
+    fun setCurrentDate(newDate: LocalDate) {
+        currentDate.value = newDate
+        updateDateAllContent()
+    }
+
+    private fun updateDateAllContent() {
+        val epochDay = currentDate.value.toEpochDay().toInt()
         val query = box.query(ChatHistory_.date.equal(epochDay)).build()
         val results = query.find()
-        return results.map { it.content }
+        dateAllContent.value = results.map { it.content }
     }
 
-    fun searchAllDate(): List<LocalDate> {
+    private fun updateAllDate() {
         val query = box.query().build()
         val results = query.find()
-        return results.map { it.date }.distinct()
+        allDates.value = results.map { it.date }.distinct()
     }
 }

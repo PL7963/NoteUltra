@@ -15,12 +15,13 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
+import com.coolkie.noteultra.utils.VectorUtils
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -31,11 +32,10 @@ fun formatterDate(localDate: LocalDate): String {
 }
 
 @Composable
-fun HistorySheet(
-  dates: List<LocalDate>,
-  currentLocalDate: MutableState<LocalDate>,
-  drawerState: DrawerState
-) {
+fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
+  val currentDate by vectorUtils.currentDate
+  val dates by vectorUtils.allDates
+
   ModalDrawerSheet {
     Column(
       modifier = Modifier
@@ -56,7 +56,7 @@ fun HistorySheet(
         style = MaterialTheme.typography.titleMedium
       )
       dates.take(5).forEach { date ->
-        DateItem(date, currentLocalDate, drawerState)
+        DateItem(date, currentDate, drawerState, vectorUtils)
       }
       if (dates.size > 5) {
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
@@ -67,7 +67,7 @@ fun HistorySheet(
           style = MaterialTheme.typography.titleMedium
         )
         dates.drop(5).forEach { date ->
-          DateItem(date, currentLocalDate, drawerState)
+          DateItem(date, currentDate, drawerState, vectorUtils)
         }
       }
     }
@@ -77,8 +77,9 @@ fun HistorySheet(
 @Composable
 fun DateItem(
   localDate: LocalDate,
-  currentLocalDate: MutableState<LocalDate>,
-  drawerState: DrawerState
+  currentDate: LocalDate,
+  drawerState: DrawerState,
+  vectorUtils: VectorUtils
 ) {
   val coroutineScope = rememberCoroutineScope()
   val date = formatterDate(localDate)
@@ -100,9 +101,9 @@ fun DateItem(
         )
       }
     },
-    selected = date == formatterDate(currentLocalDate.value),
+    selected = date == formatterDate(currentDate),
     onClick = {
-      currentLocalDate.value = localDate
+      vectorUtils.setCurrentDate(localDate)
       coroutineScope.launch {
         drawerState.close()
       }
