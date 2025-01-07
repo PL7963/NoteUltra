@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
     val vectorUtils = VectorUtils(chatHistoryBox)
 
     super.onCreate(savedInstanceState)
-    llmInstance = LlmInferenceUtils(this)
+    llmInstance = LlmInferenceUtils(this,vectorUtils)
     textEmbeddingUtils = EmbeddingUtils(this)
     voiceRecognition = VoiceRecognition(this, vectorUtils, textEmbeddingUtils)
     voiceRecognition.initModel(this)

@@ -17,7 +17,8 @@ class VectorUtils(private val box: Box<ChatHistory>) {
         updateAllDate()
     }
 
-    fun search(date: LocalDate, vector: FloatArray): List<String> {
+    fun search(vector: FloatArray): List<String> {
+        val date = LocalDate.now()
         val epochDay = date.toEpochDay().toInt()
         val query = box.query(
             ChatHistory_.contentVector.nearestNeighbors(vector, 5)

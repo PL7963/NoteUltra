@@ -5,9 +5,12 @@ import com.coolkie.noteultra.ui.llmResponseList
 import com.coolkie.noteultra.ui.userQueryList
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 
-class LlmInferenceUtils(context: Context) {
+class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
     private val llmInference: LlmInference
     private val modelPath = "/data/local/tmp/llm/model.bin"
+
+    private val embeddingUtils = EmbeddingUtils(context)
+    private val vectorUtil = vectorUtils
 
     init {
         val options = LlmInference.LlmInferenceOptions.builder()
@@ -19,10 +22,15 @@ class LlmInferenceUtils(context: Context) {
     }
 
     fun answerUserQuestion(): String {
+        val embeddedText = embeddingUtils.embedText(userQueryList.last())
+        var relatedResults = ""
+        if (embeddedText != null) {
+            relatedResults = vectorUtil.search(embeddedText).joinToString(separator = " ")
+        }
         val prompt =
             "User: 請幫助User從文本中提取資訊，Context包含使用者與其他人的對話內容，你需要根據Context內容回答問題，不得偏離問題，若Context資訊不足以回答問題，請拒絕回答問題\n"
         val context =
-            "Context: 你要啥要買的嗎？額，可以幫我買高麗菜跟雞蛋嗎？好"
+            "Context: ${relatedResults}"
         val toLlm = StringBuilder("<start_of_turn>" + prompt + context + "<end_of_turn>")
         for (i in userQueryList.indices) {
             toLlm.append("<start_of_turn>User: ${userQueryList[i]}<end_of_turn>\n")
