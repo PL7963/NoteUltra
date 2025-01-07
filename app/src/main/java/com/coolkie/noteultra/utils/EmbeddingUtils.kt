@@ -17,7 +17,7 @@ class EmbeddingUtils(
 
 
     fun setupTextEmbedder() {
-        var embeddingModel = "models/embedding/universal_sentence_encoder.tflite"
+        var embeddingModel = "models/embedding/bert_embedder.tflite"
         val baseOptions = BaseOptions
             .builder()
             .setModelAssetPath(embeddingModel)
