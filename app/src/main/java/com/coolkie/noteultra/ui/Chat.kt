@@ -29,8 +29,6 @@ val llmResponseList = mutableStateListOf<String>()
 @Composable
 fun Chat(noteViewModel: NoteViewModel) {
   val listState = rememberLazyListState()
-  val chatMessages = mutableListOf<Any>()
-  val maxSize = maxOf(userQueryList.size, llmResponseList.size)
 
   Box(
     modifier = Modifier
@@ -40,26 +38,10 @@ fun Chat(noteViewModel: NoteViewModel) {
       state = listState,
       contentPadding = PaddingValues(12.dp)
     ) {
-      for (index in 0 until maxSize) {
-        if (index < userQueryList.size) {
-          chatMessages.add(userQueryList[index])
-        }
-        if (index < llmResponseList.size) {
-          chatMessages.add(llmResponseList[index])
-        }
-      }
-
-      itemsIndexed(chatMessages) { _, item ->
-        when (item) {
-          is String -> {
-            SelectionContainer {
-              if (userQueryList.contains(item)) {
-                UserQuery(item)
-              } else {
-                LlmResponse(item, noteViewModel)
-              }
-            }
-          }
+      itemsIndexed(userQueryList) { index, userQuery ->
+        UserQuery(userQuery)
+        llmResponseList.getOrNull(index)?.let {
+          LlmResponse(it, noteViewModel)
         }
       }
     }
@@ -68,20 +50,22 @@ fun Chat(noteViewModel: NoteViewModel) {
 
 @Composable
 fun UserQuery(query: String) {
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-  ) {
+  SelectionContainer {
     Box(
       modifier = Modifier
-        .fillMaxWidth(0.8f)
-        .align(Alignment.TopEnd)
+        .fillMaxWidth()
     ) {
-      Text(
-        text = query,
+      Box(
         modifier = Modifier
+          .fillMaxWidth(0.8f)
           .align(Alignment.TopEnd)
-      )
+      ) {
+        Text(
+          text = query,
+          modifier = Modifier
+            .align(Alignment.TopEnd)
+        )
+      }
     }
   }
 }
@@ -93,35 +77,37 @@ fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel) {
       .fillMaxWidth()
       .padding(vertical = 12.dp)
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-    ) {
-      Text(
-        modifier = Modifier
-          .padding(start = 12.dp, top = 12.dp, end = 12.dp),
-        text = llmResponse
-      )
-      Box(
+    SelectionContainer {
+      Column(
         modifier = Modifier
           .fillMaxWidth()
       ) {
-        IconButton(
-          onClick = {
-            noteViewModel.addNote(
-              "Note Title",
-              "Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。",
-              System.currentTimeMillis()
-            )
-          },
+        Text(
           modifier = Modifier
-            .align(Alignment.TopEnd)
+            .padding(start = 12.dp, top = 12.dp, end = 12.dp),
+          text = llmResponse
+        )
+        Box(
+          modifier = Modifier
+            .fillMaxWidth()
         ) {
-          Icon(
-            painter = painterResource
-              (id = R.drawable.rounded_add_24),
-            contentDescription = "Add"
-          )
+          IconButton(
+            onClick = {
+              noteViewModel.addNote(
+                "Note Title",
+                "Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。",
+                System.currentTimeMillis()
+              )
+            },
+            modifier = Modifier
+              .align(Alignment.TopEnd)
+          ) {
+            Icon(
+              painter = painterResource
+                (id = R.drawable.rounded_add_24),
+              contentDescription = "Add"
+            )
+          }
         }
       }
     }
