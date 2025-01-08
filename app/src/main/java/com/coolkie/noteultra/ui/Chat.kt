@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,10 +52,12 @@ fun Chat(noteViewModel: NoteViewModel) {
       itemsIndexed(chatMessages) { _, item ->
         when (item) {
           is String -> {
-            if (userQueryList.contains(item)) {
-              UserQuery(item)
-            } else {
-              LlmResponse(item, noteViewModel)
+            SelectionContainer {
+              if (userQueryList.contains(item)) {
+                UserQuery(item)
+              } else {
+                LlmResponse(item, noteViewModel)
+              }
             }
           }
         }
