@@ -13,10 +13,10 @@ import com.coolkie.noteultra.utils.asr.VoiceRecognition
 import io.objectbox.BoxStore
 
 class NoteUltraApp : Application() {
-    val boxStore: BoxStore by lazy {
+    val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    private val boxStore: BoxStore by lazy {
         MyObjectBox.builder().androidContext(this).build()
     }
-    val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     val vectorUtils by lazy {
         val chatHistoryBox = boxStore.boxFor(ChatHistory::class.java)
         VectorUtils(chatHistoryBox)
@@ -27,10 +27,9 @@ class NoteUltraApp : Application() {
     val textEmbeddingUtils by lazy {
         EmbeddingUtils(this)
     }
-    val voiceRecognition by lazy {
+    val voiceRecognition: VoiceRecognition =
         VoiceRecognition(this, vectorUtils, textEmbeddingUtils).apply {
             initModel(this@NoteUltraApp)
             startRecording(this@NoteUltraApp)
         }
-    }
 }
