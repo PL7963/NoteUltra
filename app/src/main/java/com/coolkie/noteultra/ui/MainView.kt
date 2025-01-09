@@ -241,7 +241,7 @@ fun MainView(
         BottomSheetScaffold(
           scaffoldState = scaffoldState,
           sheetPeekHeight = 40.dp,
-          sheetContent = { Chat(noteViewModel) }
+          sheetContent = { Chat(noteViewModel, llmInstance) }
         ) {
           HorizontalPager(
             state = pagerState,
