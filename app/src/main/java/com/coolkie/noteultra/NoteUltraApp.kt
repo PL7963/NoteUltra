@@ -9,7 +9,6 @@ import com.coolkie.noteultra.data.MyObjectBox
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 import com.coolkie.noteultra.utils.VectorUtils
-import com.coolkie.noteultra.utils.asr.VoiceRecognition
 import io.objectbox.BoxStore
 
 class NoteUltraApp : Application() {
@@ -26,8 +25,5 @@ class NoteUltraApp : Application() {
     }
     val textEmbeddingUtils by lazy {
         EmbeddingUtils(this)
-    }
-    val voiceRecognition by lazy {
-        VoiceRecognition(this, vectorUtils, textEmbeddingUtils)
     }
 }
