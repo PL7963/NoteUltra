@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.coolkie.noteultra.data.ChatHistory
 import com.coolkie.noteultra.data.MyObjectBox
-import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.LlmInferenceUtils
 import com.coolkie.noteultra.utils.VectorUtils
 import io.objectbox.BoxStore
@@ -22,8 +21,5 @@ class NoteUltraApp : Application() {
     }
     val llmInstance by lazy {
         LlmInferenceUtils(this, vectorUtils)
-    }
-    val textEmbeddingUtils by lazy {
-        EmbeddingUtils(this)
     }
 }
