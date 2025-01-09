@@ -27,9 +27,7 @@ class NoteUltraApp : Application() {
     val textEmbeddingUtils by lazy {
         EmbeddingUtils(this)
     }
-    val voiceRecognition: VoiceRecognition =
-        VoiceRecognition(this, vectorUtils, textEmbeddingUtils).apply {
-            initModel(this@NoteUltraApp)
-            startRecording(this@NoteUltraApp)
-        }
+    val voiceRecognition by lazy {
+        VoiceRecognition(this, vectorUtils, textEmbeddingUtils)
+    }
 }

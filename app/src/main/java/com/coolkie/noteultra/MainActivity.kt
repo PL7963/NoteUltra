@@ -24,6 +24,10 @@ class MainActivity : ComponentActivity() {
         val llmInstance = app.llmInstance
         val textEmbeddingUtils = app.textEmbeddingUtils
         val vectorUtils = app.vectorUtils
+        val voiceRecognition = app.voiceRecognition
+
+        voiceRecognition.initModel(this)
+        voiceRecognition.startRecording(this)
 
         enableEdgeToEdge()
         setContent {
