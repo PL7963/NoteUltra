@@ -46,14 +46,23 @@ class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
         return response
     }
 
-    fun summaryResponse(): String {
-        val prompt = "User: 請簡化Context所提供的內容，整理成一份可讀性高的文字\n"
-        val context = "你在之前的對話中你提到你需要購買高麗菜跟雞蛋"
-        val toLlm = StringBuilder("<start_of_turn>" + prompt + context + "<end_of_turn>")
-        toLlm.append("<start_of_turn>Assistant: ")
+    fun generateNotes(message: String): Array<String> {
+        val promptTitle = "請把USER說的句子簡化成標題，盡可能的簡短"
+        val toLlmTitle = StringBuilder().apply {
+            append("<start_of_turn>$promptTitle<end_of_turn>")
+            append("<start_of_turn>USER: $message<end_of_turn>")
+            append("<start_of_turn>Title: ")
+        }
+        val title = llmInference.generateResponse(toLlmTitle.toString())
 
-        val response = llmInference.generateResponse(toLlm.toString())
+        val promptContent = "請把USER說的句子生成重點"
+        val toLlmContent = StringBuilder().apply {
+            append("<start_of_turn>$promptContent<end_of_turn>")
+            append("<start_of_turn>USER: $message<end_of_turn>")
+            append("<start_of_turn>Content: ")
+        }
+        val content = llmInference.generateResponse(toLlmContent.toString())
 
-        return response
+        return arrayOf(title, content)
     }
 }
