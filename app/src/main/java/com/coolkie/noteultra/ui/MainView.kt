@@ -65,6 +65,7 @@ fun MainView(
   val coroutineScope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
   val focusManager = LocalFocusManager.current
+  val isButtonEnable = remember { mutableStateOf(true) }
   val userInput = remember { mutableStateOf("") }
 
   LaunchedEffect(pagerState.currentPage) {
@@ -212,16 +213,19 @@ fun MainView(
                         scaffoldState.bottomSheetState.expand()
                       }
                       launch {
+                        isButtonEnable.value = false
                         llmResponseList.add(
                           withContext(Dispatchers.IO) { llmInstance.answerUserQuestion() }
                         )
+                        isButtonEnable.value = true
                       }
                       userInput.value = ""
                     }
                   }
                 },
                 modifier = Modifier
-                  .padding(end = 4.dp)
+                  .padding(end = 4.dp),
+                enabled = isButtonEnable.value
               ) {
                 Icon(
                   painter = painterResource
@@ -241,7 +245,7 @@ fun MainView(
         BottomSheetScaffold(
           scaffoldState = scaffoldState,
           sheetPeekHeight = 40.dp,
-          sheetContent = { Chat(noteViewModel, llmInstance) }
+          sheetContent = { Chat(noteViewModel, llmInstance, isButtonEnable) }
         ) {
           HorizontalPager(
             state = pagerState,
