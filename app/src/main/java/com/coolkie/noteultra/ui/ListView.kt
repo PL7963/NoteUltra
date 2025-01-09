@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -80,7 +79,7 @@ fun ProduceCard(note: Note, noteViewModel: NoteViewModel) {
       )
       Spacer(modifier = Modifier.height(6.dp))
       Text(
-        text = "${note.id}, ${note.content}",
+        text = note.content,
         style = MaterialTheme.typography.titleMedium
       )
     }
@@ -91,12 +90,9 @@ fun ProduceCard(note: Note, noteViewModel: NoteViewModel) {
       onDismissRequest = {},
       title = { Text(note.title) },
       text = {
-        Column(
-          modifier = Modifier
-            .verticalScroll(rememberScrollState())
-        ) {
+        SelectionContainer {
           Text(
-            text = "${note.id}, ${note.content}",
+            text = note.content,
             style = MaterialTheme.typography.bodyLarge
           )
         }

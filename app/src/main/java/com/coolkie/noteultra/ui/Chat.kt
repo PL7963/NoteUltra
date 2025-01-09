@@ -16,18 +16,22 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.NoteViewModel
+import com.coolkie.noteultra.utils.LlmInferenceUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 val userQueryList = mutableStateListOf<String>()
 val llmResponseList = mutableStateListOf<String>()
 
 @Composable
-fun Chat(noteViewModel: NoteViewModel) {
+fun Chat(noteViewModel: NoteViewModel, llmInstance: LlmInferenceUtils) {
   val listState = rememberLazyListState()
 
   Box(
@@ -41,7 +45,7 @@ fun Chat(noteViewModel: NoteViewModel) {
       itemsIndexed(userQueryList) { index, userQuery ->
         UserQuery(userQuery)
         llmResponseList.getOrNull(index)?.let {
-          LlmResponse(it, noteViewModel)
+          LlmResponse(it, noteViewModel, llmInstance)
         }
       }
     }
@@ -71,7 +75,9 @@ fun UserQuery(query: String) {
 }
 
 @Composable
-fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel) {
+fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel, llmInstance: LlmInferenceUtils) {
+  val coroutineScope = rememberCoroutineScope()
+
   Card(
     modifier = Modifier
       .fillMaxWidth()
@@ -93,11 +99,13 @@ fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel) {
         ) {
           IconButton(
             onClick = {
-              noteViewModel.addNote(
-                "Note Title",
-                "Material design的根本都是來自現實世界中的印刷設計，像是頁面的基線以及網格結構。這種佈局都是被設計給予不同屏幕尺寸且便於UI的開發使用，最終的目的是要做出可伸縮的應用程式。",
-                System.currentTimeMillis()
-              )
+              coroutineScope.launch(Dispatchers.IO) {
+                val note = llmInstance.generateNotes(llmResponse)
+                noteViewModel.addNote(
+                  note[0],note[1],
+                  System.currentTimeMillis()
+                )
+              }
             },
             modifier = Modifier
               .align(Alignment.TopEnd)
