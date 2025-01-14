@@ -12,11 +12,9 @@ import com.coolkie.noteultra.data.NotesDatabase
 import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.EmbeddingUtils
-import com.coolkie.noteultra.utils.asr.VoiceRecognition
 
 class MainActivity : ComponentActivity() {
     private lateinit var textEmbeddingUtils: EmbeddingUtils
-    private lateinit var voiceRecognition: VoiceRecognition
     private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory(NotesDatabase.getDatabase(applicationContext))
     }
@@ -28,9 +26,6 @@ class MainActivity : ComponentActivity() {
         val llmInstance = app.llmInstance
         val vectorUtils = app.vectorUtils
         textEmbeddingUtils = EmbeddingUtils(this)
-        voiceRecognition = VoiceRecognition(this, vectorUtils, textEmbeddingUtils)
-        voiceRecognition.initModel(this)
-        voiceRecognition.startRecording(this)
 
         enableEdgeToEdge()
         setContent {
