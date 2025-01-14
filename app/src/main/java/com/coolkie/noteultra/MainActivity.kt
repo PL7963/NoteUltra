@@ -9,6 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.data.NoteViewModelFactory
 import com.coolkie.noteultra.data.NotesDatabase
+import com.coolkie.noteultra.foregroundservice.SpeechRecognitionService
 import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.EmbeddingUtils
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
         val llmInstance = app.llmInstance
         val vectorUtils = app.vectorUtils
         textEmbeddingUtils = EmbeddingUtils(this)
+        SpeechRecognitionService.ensureServiceRunning(this)
 
         enableEdgeToEdge()
         setContent {
