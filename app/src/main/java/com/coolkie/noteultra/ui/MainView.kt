@@ -41,6 +41,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.NoteViewModel
@@ -111,7 +112,7 @@ fun MainView(
               ) {
                 Icon(
                   painter = painterResource(id = R.drawable.rounded_grid_view_24),
-                  contentDescription = "Grid"
+                  contentDescription = stringResource(R.string.main_view_notes_button)
                 )
               }
               SegmentedButton(
@@ -133,7 +134,7 @@ fun MainView(
               ) {
                 Icon(
                   painter = painterResource(R.drawable.rounded_article_24),
-                  contentDescription = "Grid"
+                  contentDescription = stringResource(R.string.main_view_transcript_button)
                 )
               }
             }
@@ -156,7 +157,7 @@ fun MainView(
             ) {
               Icon(
                 painter = painterResource(id = R.drawable.rounded_menu_24),
-                contentDescription = "Menu"
+                contentDescription = stringResource(R.string.main_view_dates_selector_button)
               )
             }
           },
@@ -170,7 +171,7 @@ fun MainView(
             ) {
               Icon(
                 painter = painterResource(id = R.drawable.rounded_settings_24),
-                contentDescription = "Settings"
+                contentDescription = stringResource(R.string.main_view_settings_button)
               )
             }
           }
@@ -193,7 +194,7 @@ fun MainView(
           TextField(
             value = userInput.value,
             onValueChange = { userInput.value = it },
-            placeholder = { Text("Enter the question") },
+            placeholder = { Text(stringResource(R.string.main_view_input_placeholder)) },
             modifier = Modifier
               .fillMaxWidth()
               .padding(top = 8.dp)
@@ -230,7 +231,7 @@ fun MainView(
                 Icon(
                   painter = painterResource
                     (id = R.drawable.rounded_send_24),
-                  contentDescription = "Send"
+                  contentDescription = stringResource(R.string.main_view_send_button)
                 )
               }
             }

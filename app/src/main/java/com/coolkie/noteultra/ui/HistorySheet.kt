@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.utils.VectorUtils
@@ -44,13 +45,13 @@ fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
     ) {
       Spacer(Modifier.height(12.dp))
       Text(
-        "History",
+        stringResource(R.string.history_sheet_title),
         modifier = Modifier
           .padding(12.dp),
         style = MaterialTheme.typography.titleLarge
       )
       Text(
-        "Last 5 days",
+        stringResource(R.string.history_sheet_recent),
         modifier = Modifier
           .padding(12.dp),
         style = MaterialTheme.typography.titleMedium
@@ -61,7 +62,7 @@ fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
       if (dates.size > 5) {
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         Text(
-          "Old",
+          stringResource(R.string.history_sheet_old),
           modifier = Modifier
             .padding(12.dp),
           style = MaterialTheme.typography.titleMedium
@@ -85,14 +86,14 @@ fun DateItem(
   val date = formatterDate(localDate)
   var text = date
   if (localDate == LocalDate.now()) {
-    text = "Today"
+    text = stringResource(R.string.history_sheet_today)
   }
   NavigationDrawerItem(
     label = {
       Row {
         Icon(
           painter = painterResource(R.drawable.round_fiber_manual_record_24),
-          contentDescription = "Grid"
+          contentDescription = ""
         )
         Text(
           text,

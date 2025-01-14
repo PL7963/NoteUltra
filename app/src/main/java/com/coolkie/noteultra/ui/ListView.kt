@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,13 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.Note
 import com.coolkie.noteultra.data.NoteViewModel
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ListView(noteViewModel: NoteViewModel) {
@@ -98,29 +95,23 @@ fun ProduceCard(note: Note, noteViewModel: NoteViewModel) {
         }
       },
       dismissButton = {
-        Row {
-          val date = Instant.ofEpochMilli(note.date)
-            .atZone(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-          Text(date)
-          IconButton(
-            onClick = {
-              showDialog.value = false
-              noteViewModel.deleteNote(note)
-            }
-          ) {
-            Icon(
-              painter = painterResource(id = R.drawable.rounded_delete_24),
-              contentDescription = "delete"
-            )
+        IconButton(
+          onClick = {
+            showDialog.value = false
+            noteViewModel.deleteNote(note)
           }
+        ) {
+          Icon(
+            painter = painterResource(id = R.drawable.rounded_delete_24),
+            contentDescription = stringResource(R.string.list_view_delete_note_button)
+          )
         }
       },
       confirmButton = {
         Button(
           onClick = { showDialog.value = false }
         ) {
-          Text("close")
+          Text(stringResource(R.string.list_view_close_note_button))
         }
       }
     )

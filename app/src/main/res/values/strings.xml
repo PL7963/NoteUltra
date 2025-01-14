@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Note Ultra</string>
+    <string name="main_view_notes_button">Notes</string>
+    <string name="main_view_transcript_button">Transcript</string>
+    <string name="main_view_settings_button">Settings</string>
+    <string name="main_view_input_placeholder">Enter the question</string>
+    <string name="main_view_send_button">Send</string>
+    <string name="main_view_dates_selector_button">Dates selector</string>
+    <string name="chat_page_add_note_button">Add note</string>
+    <string name="history_sheet_title">History</string>
+    <string name="history_sheet_recent">Last 5 days</string>
+    <string name="history_sheet_old">Old</string>
+    <string name="history_sheet_today">Today</string>
+    <string name="list_view_delete_note_button">Delete</string>
+    <string name="list_view_close_note_button">Close</string>
 </resources>

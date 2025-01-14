@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Note Ultra</string>
+    <string name="main_view_notes_button">筆記</string>
+    <string name="main_view_transcript_button">轉錄稿</string>
+    <string name="main_view_settings_button">設定</string>
+    <string name="main_view_input_placeholder">輸入問題</string>
+    <string name="main_view_send_button">送出</string>
+    <string name="main_view_dates_selector_button">日期選擇</string>
+    <string name="chat_page_add_note_button">新增筆記</string>
+    <string name="history_sheet_title">歷史</string>
+    <string name="history_sheet_recent">最近5天</string>
+    <string name="history_sheet_old">更早之前</string>
+    <string name="history_sheet_today">今天</string>
+    <string name="list_view_delete_note_button">刪除</string>
+    <string name="list_view_close_note_button">關閉</string>
+</resources>

@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.NoteViewModel
@@ -117,7 +118,7 @@ fun LlmResponse(llmResponse: String, noteViewModel: NoteViewModel, llmInstance: 
             Icon(
               painter = painterResource
                 (id = R.drawable.rounded_add_24),
-              contentDescription = "Add"
+              contentDescription = stringResource(R.string.chat_page_add_note_button)
             )
           }
         }
