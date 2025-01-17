@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import com.coolkie.noteultra.NoteUltraApp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.utils.EmbeddingUtils
+import com.coolkie.noteultra.utils.asr.VoiceRecognition
 
 class SpeechRecognitionService : Service() {
     companion object {
@@ -39,7 +40,7 @@ class SpeechRecognitionService : Service() {
     }
 
     private lateinit var embeddingUtils: EmbeddingUtils
-//    private lateinit var voiceRecognition: VoiceRecognition
+    private lateinit var voiceRecognition: VoiceRecognition
 
     override fun onCreate() {
         super.onCreate()
@@ -49,12 +50,12 @@ class SpeechRecognitionService : Service() {
         val app = applicationContext as NoteUltraApp
         val vectorUtils = app.vectorUtils
         embeddingUtils = EmbeddingUtils(this)
-//        voiceRecognition = VoiceRecognition(this, vectorUtils, embeddingUtils)
-//        voiceRecognition.initModel(this)
+        voiceRecognition = VoiceRecognition(this, vectorUtils, embeddingUtils)
+        voiceRecognition.initModel(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        voiceRecognition.startRecording(this)
+        voiceRecognition.startRecording(this)
         return START_STICKY
     }
 
