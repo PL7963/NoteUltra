@@ -1,8 +1,6 @@
 package com.coolkie.noteultra.utils
 
 import android.content.Context
-import com.coolkie.noteultra.ui.llmResponseList
-import com.coolkie.noteultra.ui.userQueryList
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 
 class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
@@ -21,13 +19,14 @@ class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
         llmInference = LlmInference.createFromOptions(context, options)
     }
 
-    fun answerUserQuestion(): String {
+    fun answerUserQuestion(
+        userQueryLast3: List<String>,
+        llmResponseLast3: List<String>,
+        userQuery: String
+    ): String {
         val prompt = "請試著用以下文本與USER交談，如果文本與USER無關請自行回答USER"
-        val embeddedText = embeddingUtils.embedText(userQueryList.last())
+        val embeddedText = embeddingUtils.embedText(userQuery)
         val relatedResults = embeddedText?.let { vectorUtil.search(it) }
-        val userQueryLast3 = userQueryList.takeLast(4).dropLast(1)
-        val userQuery = userQueryList.last()
-        val llmResponseLast3 = llmResponseList.takeLast(3)
         val toLlm = StringBuilder().apply {
             append("<start_of_turn>$prompt<end_of_turn>")
             relatedResults?.forEach { result ->

@@ -36,6 +36,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,6 +74,8 @@ fun MainView(
   val focusManager = LocalFocusManager.current
   val isButtonEnable = remember { mutableStateOf(true) }
   val userInput = remember { mutableStateOf("") }
+  val userQueryList = remember { mutableStateListOf<String>() }
+  val llmResponseList = remember { mutableStateListOf<String>() }
 
   LaunchedEffect(pagerState.currentPage) {
     selectedOption.intValue = pagerState.currentPage
@@ -221,7 +224,13 @@ fun MainView(
                       launch {
                         isButtonEnable.value = false
                         llmResponseList.add(
-                          withContext(Dispatchers.IO) { llmInstance.answerUserQuestion() }
+                          withContext(Dispatchers.IO) {
+                            llmInstance.answerUserQuestion(
+                              userQueryList.takeLast(4).dropLast(1),
+                              llmResponseList.takeLast(3),
+                              userQueryList.last()
+                            )
+                          }
                         )
                         isButtonEnable.value = true
                       }
@@ -257,7 +266,15 @@ fun MainView(
         BottomSheetScaffold(
           scaffoldState = scaffoldState,
           sheetPeekHeight = 40.dp,
-          sheetContent = { Chat(noteViewModel, llmInstance, isButtonEnable) }
+          sheetContent = {
+            Chat(
+              noteViewModel,
+              llmInstance,
+              userQueryList,
+              llmResponseList,
+              isButtonEnable
+            )
+          }
         ) {
           HorizontalPager(
             state = pagerState,
