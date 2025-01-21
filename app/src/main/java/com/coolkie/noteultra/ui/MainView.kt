@@ -209,7 +209,7 @@ fun MainView(
             trailingIcon = {
               IconButton(
                 onClick = {
-                  if (userInput.value.isNotEmpty()) {
+                  if (userInput.value.replace("\\s+".toRegex(), "").isNotEmpty()) {
                     userQueryList.add(userInput.value)
                     coroutineScope.launch {
                       launch {
