@@ -28,11 +28,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -70,7 +72,14 @@ fun MainView(
   val pagerState = rememberPagerState { 2 }
   val selectedOption = remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
-  val scaffoldState = rememberBottomSheetScaffoldState()
+  val scaffoldState = rememberBottomSheetScaffoldState(
+    bottomSheetState = rememberStandardBottomSheetState(
+      initialValue = SheetValue.PartiallyExpanded,
+      confirmValueChange = { newState ->
+        newState != SheetValue.Hidden
+      },
+    )
+  )
   val focusManager = LocalFocusManager.current
   val isButtonEnable = remember { mutableStateOf(true) }
   val userInput = remember { mutableStateOf("") }
