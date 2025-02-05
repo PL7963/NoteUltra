@@ -20,71 +20,71 @@ import kotlinx.coroutines.launch
 
 @Entity(tableName = "notes")
 data class Note(
-  @PrimaryKey(autoGenerate = true) val id: Int = 0,
-  val title: String,
-  val content: String,
-  val date: Long
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val title: String,
+    val content: String,
+    val date: Long
 )
 
 @Dao
 interface NotesDao {
-  @Insert
-  suspend fun insert(note: Note)
+    @Insert
+    suspend fun insert(note: Note)
 
-  @Delete
-  suspend fun delete(note: Note)
+    @Delete
+    suspend fun delete(note: Note)
 
-  @Query("SELECT * FROM notes ORDER BY date DESC")
-  fun getAllNotes(): Flow<List<Note>>
+    @Query("SELECT * FROM notes ORDER BY date DESC")
+    fun getAllNotes(): Flow<List<Note>>
 }
 
-@Database(entities = [Note::class], version = 1)
+@Database(entities = [Note::class], version = 1, exportSchema = false)
 abstract class NotesDatabase : RoomDatabase() {
-  abstract fun noteDao(): NotesDao
+    abstract fun noteDao(): NotesDao
 
-  companion object {
-    @Volatile
-    private var INSTANCE: NotesDatabase? = null
+    companion object {
+        @Volatile
+        private var INSTANCE: NotesDatabase? = null
 
-    fun getDatabase(context: Context): NotesDatabase {
-      return INSTANCE ?: synchronized(this) {
-        val instance = Room.databaseBuilder(
-          context.applicationContext,
-          NotesDatabase::class.java,
-          "notes_database"
-        ).build()
+        fun getDatabase(context: Context): NotesDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    NotesDatabase::class.java,
+                    "notes_database"
+                ).build()
 
-        INSTANCE = instance
-        instance
-      }
+                INSTANCE = instance
+                instance
+            }
+        }
     }
-  }
 }
 
 class NoteViewModel(private val database: NotesDatabase) : ViewModel() {
-  val noteList = database.noteDao().getAllNotes()
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val noteList = database.noteDao().getAllNotes()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-  fun addNote(title: String, content: String, date: Long) {
-    val note = Note(title = title, content = content, date = date)
-    viewModelScope.launch {
-      database.noteDao().insert(note)
+    fun addNote(title: String, content: String, date: Long) {
+        val note = Note(title = title, content = content, date = date)
+        viewModelScope.launch {
+            database.noteDao().insert(note)
+        }
     }
-  }
 
-  fun deleteNote(note: Note) {
-    viewModelScope.launch {
-      database.noteDao().delete(note)
+    fun deleteNote(note: Note) {
+        viewModelScope.launch {
+            database.noteDao().delete(note)
+        }
     }
-  }
 }
 
 class NoteViewModelFactory(private val database: NotesDatabase) : ViewModelProvider.Factory {
-  @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel> create(modelClass: Class<T>): T {
-    if (modelClass.isAssignableFrom(NoteViewModel::class.java)) {
-      return NoteViewModel(database) as T
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(NoteViewModel::class.java)) {
+            return NoteViewModel(database) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
-    throw IllegalArgumentException("Unknown ViewModel class")
-  }
 }
