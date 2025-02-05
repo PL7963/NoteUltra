@@ -13,4 +13,5 @@
     <string name="history_sheet_today">Today</string>
     <string name="list_view_delete_note_button">Delete</string>
     <string name="list_view_close_note_button">Close</string>
+    <string name="time_view_floating_button">Scroll to bottom</string>
 </resources>

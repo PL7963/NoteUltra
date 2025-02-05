@@ -14,4 +14,5 @@
     <string name="history_sheet_today">今天</string>
     <string name="list_view_delete_note_button">刪除</string>
     <string name="list_view_close_note_button">關閉</string>
+    <string name="time_view_floating_button">滾動至底部</string>
 </resources>
