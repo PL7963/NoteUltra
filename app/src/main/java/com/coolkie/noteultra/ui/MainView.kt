@@ -42,6 +42,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
@@ -82,7 +83,7 @@ fun MainView(
   )
   val focusManager = LocalFocusManager.current
   val isButtonEnable = remember { mutableStateOf(true) }
-  val userInput = remember { mutableStateOf("") }
+  val userInput = rememberSaveable { mutableStateOf("") }
   val userQueryList = remember { mutableStateListOf<String>() }
   val llmResponseList = remember { mutableStateListOf<String>() }
 
