@@ -8,10 +8,13 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.coolkie.noteultra.data.DarkMode
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowInsetsControllerCompat
+import com.coolkie.noteultra.data.DarkTheme
 import com.coolkie.noteultra.data.SettingsRepository
 import com.coolkie.noteultra.data.dataStore
 
@@ -44,15 +47,14 @@ fun NoteUltraTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val settingsRepository = remember(context) { SettingsRepository(context.dataStore) }
-    val darkModeState = settingsRepository.darkModeFlow.collectAsState(DarkMode.SYSTEM)
-    val darkMode = darkModeState.value
-    val darkTheme = when (darkMode) {
-        DarkMode.ENABLED -> true
-        DarkMode.DISABLED -> false
-        DarkMode.SYSTEM -> isSystemInDarkTheme()
-    }
 
+    val repository = remember(context) { SettingsRepository(context.dataStore) }
+    val darkThemeFlow = repository.darkThemeFlow.collectAsState(repository.darkThemeFirst).value
+    val darkTheme = when (darkThemeFlow) {
+        DarkTheme.ENABLED -> true
+        DarkTheme.DISABLED -> false
+        DarkTheme.SYSTEM -> isSystemInDarkTheme()
+    }
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -60,6 +62,15 @@ fun NoteUltraTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    val view = LocalView.current
+    LaunchedEffect(darkTheme) {
+        if (view.isAttachedToWindow) {
+            val window = (view.context as? android.app.Activity)?.window ?: return@LaunchedEffect
+            val windowInsetsController = WindowInsetsControllerCompat(window, view)
+            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+        }
     }
 
     MaterialTheme(

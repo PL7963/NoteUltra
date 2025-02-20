@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -20,7 +22,7 @@ enum class LlmSource {
     DISABLED
 }
 
-enum class DarkMode {
+enum class DarkTheme {
     ENABLED,
     DISABLED,
     SYSTEM
@@ -37,7 +39,7 @@ class SettingsRepository(
     private object PreferencesKeys {
         val LLM_SOURCE = stringPreferencesKey("llm_source")
         val LLM_PATH = stringPreferencesKey("llm_path")
-        val DARK_MODE = stringPreferencesKey("dark_mode")
+        val DARK_THEME = stringPreferencesKey("dark_theme")
     }
 
     val llmSourceFlow: Flow<LlmPreferences> = dataStore.data
@@ -55,7 +57,7 @@ class SettingsRepository(
             )
         }
 
-    val darkModeFlow: Flow<DarkMode> = dataStore.data
+    val darkThemeFlow: Flow<DarkTheme> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -64,8 +66,13 @@ class SettingsRepository(
             }
         }
         .map { preferences ->
-            DarkMode.valueOf(preferences[PreferencesKeys.DARK_MODE] ?: DarkMode.SYSTEM.name)
+            DarkTheme.valueOf(preferences[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
         }
+
+    val darkThemeFirst: DarkTheme = runBlocking {
+        val preferences = dataStore.data.first()
+        DarkTheme.valueOf(preferences[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
+    }
 
     suspend fun llmPreferences(preferences: LlmPreferences) {
         dataStore.edit { preferencesMap ->
@@ -74,9 +81,9 @@ class SettingsRepository(
         }
     }
 
-    suspend fun darkMode(mode: DarkMode) {
+    suspend fun darkTheme(theme: DarkTheme) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.DARK_MODE] = mode.name
+            preferences[PreferencesKeys.DARK_THEME] = theme.name
         }
     }
 }
