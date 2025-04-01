@@ -45,10 +45,13 @@ fun TimeView(vectorUtils: VectorUtils) {
   }
 
   LaunchedEffect(itemsList) {
-    val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-    if (lastVisibleIndex == itemsList.lastIndex || initial.value) {
-      listState.scrollToItem(itemsList.lastIndex)
-      initial.value = false
+    if (itemsList.isNotEmpty()) {
+      val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+
+      if (lastVisibleIndex == itemsList.lastIndex || initial.value) {
+        listState.scrollToItem(itemsList.lastIndex)
+        initial.value = false
+      }
     }
   }
 
