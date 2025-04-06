@@ -1,12 +1,14 @@
 package com.coolkie.noteultra.data
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.coolkie.noteultra.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -16,74 +18,119 @@ import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-enum class LlmSource {
-    LOCAL,
-    REMOTE,
-    DISABLED
+enum class LlmMode(@StringRes val labelResId: Int) {
+    LOCAL(R.string.settings_llm_source_local),
+    REMOTE(R.string.settings_llm_source_remote),
+    DISABLE(R.string.settings_llm_source_disable)
 }
 
-enum class DarkTheme {
-    ENABLED,
-    DISABLED,
-    SYSTEM
+enum class DarkTheme(@StringRes val labelResId: Int) {
+    ENABLE(R.string.settings_dark_theme_enable),
+    DISABLE(R.string.settings_dark_theme_disable),
+    SYSTEM(R.string.settings_dark_theme_system)
 }
-
-data class LlmPreferences(
-    val llmSource: LlmSource,
-    val llmPath: String
-)
 
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>
 ) {
     private object PreferencesKeys {
-        val LLM_SOURCE = stringPreferencesKey("llm_source")
+        val LLM_MODE = stringPreferencesKey("llm_mode")
         val LLM_PATH = stringPreferencesKey("llm_path")
+        val LLM_URL = stringPreferencesKey("llm_url")
         val DARK_THEME = stringPreferencesKey("dark_theme")
     }
 
-    val llmSourceFlow: Flow<LlmPreferences> = dataStore.data
-        .catch { exception ->
+    private fun Flow<Preferences>.catchIOException(): Flow<Preferences> {
+        return this.catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
             } else {
                 throw exception
             }
         }
+    }
+
+    private fun Preferences.toLlmMode(): LlmMode {
+        return LlmMode.valueOf(this[PreferencesKeys.LLM_MODE] ?: LlmMode.DISABLE.name)
+    }
+
+    private fun Preferences.toLlmPath(): String {
+        return this[PreferencesKeys.LLM_PATH] ?: "/data/local/tmp/llm/model.bin"
+    }
+
+    private fun Preferences.toLlmUrl(): String {
+        return this[PreferencesKeys.LLM_URL] ?: "http://"
+    }
+
+    private fun Preferences.toDarkTheme(): DarkTheme {
+        return DarkTheme.valueOf(this[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
+    }
+
+
+    fun llmModeInitial(): LlmMode = runBlocking {
+        dataStore.data.first().toLlmMode()
+    }
+    val llmModeFlow: Flow<LlmMode> = dataStore.data
+        .catchIOException()
         .map { preferences ->
-            LlmPreferences(
-                LlmSource.valueOf(preferences[PreferencesKeys.LLM_SOURCE] ?: LlmSource.LOCAL.name),
-                preferences[PreferencesKeys.LLM_PATH] ?: ""
-            )
+            preferences.toLlmMode()
         }
 
+    fun llmPathInitial(): String = runBlocking {
+        dataStore.data.first().toLlmPath()
+    }
+    val llmPathFlow: Flow<String> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toLlmPath()
+        }
+
+    fun llmUrlInitial(): String = runBlocking {
+        dataStore.data.first().toLlmUrl()
+    }
+    val llmUrlFlow: Flow<String> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toLlmUrl()
+        }
+
+    fun darkThemeInitial(): DarkTheme = runBlocking {
+        dataStore.data.first().toDarkTheme()
+    }
     val darkThemeFlow: Flow<DarkTheme> = dataStore.data
-        .catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }
+        .catchIOException()
         .map { preferences ->
-            DarkTheme.valueOf(preferences[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
+            preferences.toDarkTheme()
         }
 
-    val darkThemeFirst: DarkTheme = runBlocking {
-        val preferences = dataStore.data.first()
-        DarkTheme.valueOf(preferences[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
-    }
 
-    suspend fun llmPreferences(preferences: LlmPreferences) {
-        dataStore.edit { preferencesMap ->
-            preferencesMap[PreferencesKeys.LLM_SOURCE] = preferences.llmSource.name
-            preferencesMap[PreferencesKeys.LLM_PATH] = preferences.llmPath
+    suspend fun setLlmMode(mode: LlmMode) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LLM_MODE] = mode.name
         }
     }
 
-    suspend fun darkTheme(theme: DarkTheme) {
+    suspend fun setLlmPath(path: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LLM_PATH] = path
+        }
+    }
+
+    suspend fun setLlmUrl(url: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LLM_URL] = url
+        }
+    }
+
+    suspend fun setDarkTheme(theme: DarkTheme) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.DARK_THEME] = theme.name
+        }
+    }
+
+    suspend fun clearAll() {
+        dataStore.edit { preferences ->
+            preferences.clear()
         }
     }
 }

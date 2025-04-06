@@ -49,10 +49,10 @@ fun NoteUltraTheme(
     val context = LocalContext.current
 
     val repository = remember(context) { SettingsRepository(context.dataStore) }
-    val darkThemeFlow = repository.darkThemeFlow.collectAsState(repository.darkThemeFirst).value
+    val darkThemeFlow = repository.darkThemeFlow.collectAsState(repository.darkThemeInitial()).value
     val darkTheme = when (darkThemeFlow) {
-        DarkTheme.ENABLED -> true
-        DarkTheme.DISABLED -> false
+        DarkTheme.ENABLE -> true
+        DarkTheme.DISABLE -> false
         DarkTheme.SYSTEM -> isSystemInDarkTheme()
     }
     val colorScheme = when {

@@ -47,6 +47,12 @@ class VectorUtils(private val box: Box<ChatHistory>) {
         updateDateAllContent()
     }
 
+    fun clearAll() {
+        box.removeAll()
+        updateDateAllContent()
+        updateAllDate()
+    }
+
     private fun updateDateAllContent() {
         val epochDay = currentDate.value.toEpochDay().toInt()
         val query = box.query(ChatHistory_.date.equal(epochDay)).build()

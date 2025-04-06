@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Note Ultra</string>
+    <string name="app_name" translatable="false">Note Ultra</string>
     <string name="main_view_notes_button">Notes</string>
     <string name="main_view_transcript_button">Transcript</string>
     <string name="main_view_settings_button">Settings</string>
@@ -14,4 +14,26 @@
     <string name="list_view_delete_note_button">Delete</string>
     <string name="list_view_close_note_button">Close</string>
     <string name="time_view_floating_button">Scroll to bottom</string>
+    <string name="settings_llm_source_local">Local</string>
+    <string name="settings_llm_source_remote">Remote</string>
+    <string name="settings_llm_source_disable">Disable</string>
+    <string name="settings_dark_theme_enable" >Enable</string>
+    <string name="settings_dark_theme_disable" >Disable</string>
+    <string name="settings_dark_theme_system" >Follow system</string>
+    <string name="settings_item_dark_theme_title">Dark theme</string>
+    <string name="settings_item_dark_theme_description">Enabling Dark Theme reduces screen brightness, alleviates eye strain, and improves readability in low-light environments.</string>
+    <string name="settings_item_llm_settings_title">LLM Source</string>
+    <string name="settings_item_llm_settings_description">Select the LLM source to process text inputs: local model, remote model, or disable LLM.</string>
+    <string name="settings_category_ai">AI</string>
+    <string name="settings_category_theme">Theme</string>
+    <string name="settings_category_other">Other</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_back_button">Back</string>
+    <string name="settings_item_clear_data_title">Clear data</string>
+    <string name="settings_item_clear_data_description">Warning: The selected data (settings, contents, and transcripts) will be cleared or reset to default and cannot be restored.</string>
+    <string name="settings_clear_data_notes">Notes</string>
+    <string name="settings_clear_data_transcript">Transcript</string>
+    <string name="settings_clear_data_close_button">Cancel</string>
+    <string name="settings_clear_data_delete_button">Clear</string>
+    <string name="settings_clear_data_setting">Setting</string>
 </resources>

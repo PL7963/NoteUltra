@@ -36,6 +36,9 @@ interface NotesDao {
 
     @Query("SELECT * FROM notes ORDER BY date DESC")
     fun getAllNotes(): Flow<List<Note>>
+
+    @Query("DELETE FROM notes")
+    suspend fun deleteAll()
 }
 
 @Database(entities = [Note::class], version = 1, exportSchema = false)
@@ -75,6 +78,12 @@ class NoteViewModel(private val database: NotesDatabase) : ViewModel() {
     fun deleteNote(note: Note) {
         viewModelScope.launch {
             database.noteDao().delete(note)
+        }
+    }
+
+    fun deleteAllNotes() {
+        viewModelScope.launch {
+            database.noteDao().deleteAll()
         }
     }
 }
