@@ -56,20 +56,17 @@ fun HistorySheet(drawerState: DrawerState) {
           .padding(12.dp),
         style = MaterialTheme.typography.titleMedium
       )
-      dates.take(5).forEach { date ->
-        DateItem(date, currentDate, drawerState)
-      }
-      if (dates.size > 5) {
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
-        Text(
-          stringResource(R.string.history_sheet_old),
-          modifier = Modifier
-            .padding(12.dp),
-          style = MaterialTheme.typography.titleMedium
-        )
-        dates.drop(5).forEach { date ->
-          DateItem(date, currentDate, drawerState)
+      dates.forEachIndexed { index, date ->
+        if (index == 5) {
+          HorizontalDivider(Modifier.padding(vertical = 8.dp))
+          Text(
+            stringResource(R.string.history_sheet_old),
+            modifier = Modifier
+              .padding(12.dp),
+            style = MaterialTheme.typography.titleMedium
+          )
         }
+        DateItem(date, currentDate, drawerState)
       }
     }
   }
@@ -88,6 +85,7 @@ fun DateItem(
   if (localDate == LocalDate.now()) {
     text = stringResource(R.string.history_sheet_today)
   }
+
   NavigationDrawerItem(
     label = {
       Row {
