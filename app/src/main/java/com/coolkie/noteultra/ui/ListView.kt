@@ -31,10 +31,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.Note
-import com.coolkie.noteultra.data.NoteViewModel
 
 @Composable
-fun ListView(noteViewModel: NoteViewModel) {
+fun ListView() {
+  val noteViewModel = LocalNoteViewModel.current
   val notes = noteViewModel.noteList.collectAsState().value
 
   Box(
@@ -47,14 +47,15 @@ fun ListView(noteViewModel: NoteViewModel) {
       contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 48.dp)
     ) {
       items(notes) { note ->
-        ProduceCard(note, noteViewModel)
+        ProduceCard(note)
       }
     }
   }
 }
 
 @Composable
-fun ProduceCard(note: Note, noteViewModel: NoteViewModel) {
+fun ProduceCard(note: Note) {
+  val noteViewModel = LocalNoteViewModel.current
   val showDialog = remember { mutableStateOf(false) }
 
   Card(

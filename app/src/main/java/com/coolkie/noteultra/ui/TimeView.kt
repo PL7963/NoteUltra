@@ -26,11 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
-import com.coolkie.noteultra.utils.VectorUtils
 import kotlinx.coroutines.launch
 
 @Composable
-fun TimeView(vectorUtils: VectorUtils) {
+fun TimeView() {
+  val vectorUtils = LocalVectorUtils.current
   val itemsList by vectorUtils.dateAllContent
   val listState = rememberLazyListState()
   val coroutineScope = rememberCoroutineScope()

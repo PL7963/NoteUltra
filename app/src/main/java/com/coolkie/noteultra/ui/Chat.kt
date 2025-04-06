@@ -23,15 +23,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
-import com.coolkie.noteultra.data.NoteViewModel
-import com.coolkie.noteultra.utils.LlmInferenceUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun Chat(
-  noteViewModel: NoteViewModel,
-  llmInstance: LlmInferenceUtils,
   userQueryList: MutableList<String>,
   llmResponseList: MutableList<String>,
   isButtonEnable: MutableState<Boolean>
@@ -44,12 +40,12 @@ fun Chat(
   ) {
     LazyColumn(
       state = listState,
-      contentPadding = PaddingValues(12.dp)
+      contentPadding = PaddingValues(horizontal = 12.dp)
     ) {
       itemsIndexed(userQueryList) { index, userQuery ->
         UserQuery(userQuery)
         llmResponseList.getOrNull(index)?.let {
-          LlmResponse(it, noteViewModel, llmInstance, isButtonEnable)
+          LlmResponse(it, isButtonEnable)
         }
       }
     }
@@ -81,10 +77,10 @@ fun UserQuery(query: String) {
 @Composable
 fun LlmResponse(
   llmResponse: String,
-  noteViewModel: NoteViewModel,
-  llmInstance: LlmInferenceUtils,
   isButtonEnable: MutableState<Boolean>
 ) {
+  val noteViewModel = LocalNoteViewModel.current
+  val llmInstance = LocalLlmInstance.current
   val coroutineScope = rememberCoroutineScope()
 
   Card(

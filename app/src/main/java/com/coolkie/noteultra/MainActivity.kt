@@ -6,9 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.CompositionLocalProvider
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.data.NoteViewModelFactory
 import com.coolkie.noteultra.data.NotesDatabase
+import com.coolkie.noteultra.ui.LocalLlmInstance
+import com.coolkie.noteultra.ui.LocalNoteViewModel
+import com.coolkie.noteultra.ui.LocalVectorUtils
 import com.coolkie.noteultra.ui.MainView
 import com.coolkie.noteultra.ui.theme.NoteUltraTheme
 import com.coolkie.noteultra.utils.EmbeddingUtils
@@ -34,8 +38,14 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            NoteUltraTheme {
-                MainView(llmInstance, vectorUtils, noteViewModel)
+            CompositionLocalProvider(
+                LocalNoteViewModel provides noteViewModel,
+                LocalLlmInstance provides llmInstance,
+                LocalVectorUtils provides vectorUtils
+            ) {
+                NoteUltraTheme {
+                    MainView()
+                }
             }
         }
     }

@@ -53,9 +53,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
-import com.coolkie.noteultra.data.NoteViewModel
-import com.coolkie.noteultra.utils.LlmInferenceUtils
-import com.coolkie.noteultra.utils.VectorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,11 +60,8 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
-fun MainView(
-  llmInstance: LlmInferenceUtils,
-  vectorUtils: VectorUtils,
-  noteViewModel: NoteViewModel
-) {
+fun MainView() {
+  val llmInstance = LocalLlmInstance.current
   val context = LocalContext.current
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val pagerState = rememberPagerState { 2 }
@@ -92,7 +86,7 @@ fun MainView(
   }
   ModalNavigationDrawer(
     drawerContent = {
-      HistorySheet(vectorUtils, drawerState)
+      HistorySheet(drawerState)
     },
     drawerState = drawerState
   ) {
@@ -278,8 +272,6 @@ fun MainView(
           sheetPeekHeight = 40.dp,
           sheetContent = {
             Chat(
-              noteViewModel,
-              llmInstance,
               userQueryList,
               llmResponseList,
               isButtonEnable
@@ -292,8 +284,8 @@ fun MainView(
               .fillMaxSize()
           ) { page ->
             when (page) {
-              0 -> ListView(noteViewModel)
-              1 -> TimeView(vectorUtils)
+              0 -> ListView()
+              1 -> TimeView()
             }
           }
         }

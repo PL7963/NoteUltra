@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
-import com.coolkie.noteultra.utils.VectorUtils
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -33,7 +32,8 @@ fun formatterDate(localDate: LocalDate): String {
 }
 
 @Composable
-fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
+fun HistorySheet(drawerState: DrawerState) {
+  val vectorUtils = LocalVectorUtils.current
   val currentDate by vectorUtils.currentDate
   val dates by vectorUtils.allDates
 
@@ -57,7 +57,7 @@ fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
         style = MaterialTheme.typography.titleMedium
       )
       dates.take(5).forEach { date ->
-        DateItem(date, currentDate, drawerState, vectorUtils)
+        DateItem(date, currentDate, drawerState)
       }
       if (dates.size > 5) {
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
@@ -68,7 +68,7 @@ fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
           style = MaterialTheme.typography.titleMedium
         )
         dates.drop(5).forEach { date ->
-          DateItem(date, currentDate, drawerState, vectorUtils)
+          DateItem(date, currentDate, drawerState)
         }
       }
     }
@@ -79,9 +79,9 @@ fun HistorySheet(vectorUtils: VectorUtils, drawerState: DrawerState) {
 fun DateItem(
   localDate: LocalDate,
   currentDate: LocalDate,
-  drawerState: DrawerState,
-  vectorUtils: VectorUtils
+  drawerState: DrawerState
 ) {
+  val vectorUtils = LocalVectorUtils.current
   val coroutineScope = rememberCoroutineScope()
   val date = formatterDate(localDate)
   var text = date
