@@ -63,6 +63,6 @@ class VectorUtils(private val box: Box<ChatHistory>) {
     private fun updateAllDate() {
         val query = box.query().build()
         val results = query.find()
-        allDates.value = results.map { it.date }.distinct()
+        allDates.value = results.map { it.date }.distinct().sortedByDescending { it }
     }
 }
