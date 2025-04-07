@@ -30,7 +30,7 @@
     <string name="settings_title">設定</string>
     <string name="settings_back_button">返回</string>
     <string name="settings_item_clear_data_title">清除資料</string>
-    <string name="settings_item_clear_data_description">警告：這將清除所選擇的數據（使用者設定、筆記內容、語音轉錄稿），且無法還原。</string>
+    <string name="settings_item_clear_data_description">警告：所選擇的數據（使用者設定、筆記內容、語音轉錄稿）將被清除或重置為預設狀態，且無法恢復。</string>
     <string name="settings_clear_data_close_button">取消</string>
     <string name="settings_clear_data_delete_button">清除</string>
     <string name="settings_clear_data_setting">使用者設定</string>
