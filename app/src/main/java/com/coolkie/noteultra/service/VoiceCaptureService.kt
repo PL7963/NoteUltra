@@ -52,7 +52,7 @@ class ForegroundRecordingService : Service() {
             return START_NOT_STICKY
         }
         startForeground(1, createNotification())
-        voiceRecognition.startRecording(this)
+        voiceRecognition.startRecording()
 
         return START_STICKY
     }

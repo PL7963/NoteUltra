@@ -1,13 +1,9 @@
 package com.coolkie.noteultra.utils.asr
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import androidx.core.app.ActivityCompat
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.VectorUtils
 import com.k2fsa.sherpa.ncnn.RecognizerConfig
@@ -32,8 +28,15 @@ class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils)
     @Volatile
     private var isRecording: Boolean = false
 
-    fun startRecording(context: Context) {
-        if (!isRecording && initMicrophone(context)) {
+    fun startRecording() {
+        if (!isRecording) {
+            audioRecord = AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                sampleRateInHz,
+                channelConfig,
+                audioFormat,
+                AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat) * 2
+            )
             audioRecord!!.startRecording()
             isRecording = true
             recordingThread = thread(true) {
@@ -74,32 +77,6 @@ class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils)
                 }
             }
         }
-    }
-
-    private fun initMicrophone(context: Context): Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                context as Activity,
-                arrayOf(Manifest.permission.RECORD_AUDIO),
-                200
-            )
-
-            return false
-        }
-
-        audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            sampleRateInHz,
-            channelConfig,
-            audioFormat,
-            AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat) * 2
-        )
-
-        return true
     }
 
     fun initModel(context: Context) {
