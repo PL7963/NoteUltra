@@ -2,130 +2,124 @@ package com.coolkie.noteultra.utils.asr
 
 import android.Manifest
 import android.app.Activity
-import android.content.pm.PackageManager
-import android.media.AudioRecord
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.AudioFormat
+import android.media.AudioRecord
 import android.media.MediaRecorder
+import androidx.core.app.ActivityCompat
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.VectorUtils
-import kotlin.concurrent.thread
+import com.k2fsa.sherpa.ncnn.RecognizerConfig
 import com.k2fsa.sherpa.ncnn.SherpaNcnn
+import com.k2fsa.sherpa.ncnn.getDecoderConfig
 import com.k2fsa.sherpa.ncnn.getFeatureExtractorConfig
 import com.k2fsa.sherpa.ncnn.getModelConfig
-import com.k2fsa.sherpa.ncnn.getDecoderConfig
-import com.k2fsa.sherpa.ncnn.RecognizerConfig
+import kotlin.concurrent.thread
 
-class VoiceRecognition(context: Context, vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils) {
-  private val permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
+class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils) {
+    private lateinit var model: SherpaNcnn
+    private var audioRecord: AudioRecord? = null
+    private var recordingThread: Thread? = null
 
-  private lateinit var model: SherpaNcnn
-  private var audioRecord: AudioRecord? = null
-  private var recordingThread: Thread? = null
+    private val sampleRateInHz = 16000
+    private val channelConfig = AudioFormat.CHANNEL_IN_MONO
+    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
 
-  private val sampleRateInHz = 16000
-  private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-  private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+    private val embeddingUtil = embeddingUtils
+    private val vectorUtil = vectorUtils
 
-  private val embeddingUtil = embeddingUtils
-  private val vectorUtil = vectorUtils
+    @Volatile
+    private var isRecording: Boolean = false
 
-  @Volatile
-  private var isRecording: Boolean = false
-
-  fun startRecording(context: Context) {
-    if (!isRecording) {
-      val ret = initMicrophone(context)
-      if (!ret) {
-        return
-      }
-      audioRecord!!.startRecording()
-      isRecording = true
-      recordingThread = thread(true) {
-        model.reset(true)
-        processSamples()
-      }
-    } else {
-      isRecording = false
-      audioRecord!!.stop()
-      audioRecord!!.release()
-      audioRecord = null
-    }
-  }
-
-  private fun processSamples() {
-    val interval = 0.3
-    val bufferSize = (interval * sampleRateInHz).toInt() // in samples
-    val buffer = ShortArray(bufferSize)
-    Log.d("SherpaNcnn", "Is recording: ${isRecording}")
-    while (isRecording) {
-      val ret = audioRecord?.read(buffer, 0, buffer.size)
-      if (ret != null && ret > 0) {
-        val samples = FloatArray(ret) { buffer[it] / 32768.0f }
-        model.acceptSamples(samples)
-        while (model.isReady()) {
-          model.decode()
+    fun startRecording(context: Context) {
+        if (!isRecording && initMicrophone(context)) {
+            audioRecord!!.startRecording()
+            isRecording = true
+            recordingThread = thread(true) {
+                model.reset(true)
+                processSamples()
+            }
         }
-        val isEndpoint = model.isEndpoint()
-        val text = model.text
+    }
 
-        if (isEndpoint) {
-          model.reset()
-          if (text.isNotBlank()) {
-            embeddingUtil.embedText(text)?.let { vectorUtil.store(text, it) }
-          }
+    fun stopRecording() {
+        if (isRecording) {
+            isRecording = false
+            audioRecord!!.stop()
+            audioRecord!!.release()
+            audioRecord = null
         }
-      }
-    }
-  }
-
-  private fun initMicrophone(context: Context): Boolean {
-    if (ActivityCompat.checkSelfPermission(
-        context,
-        Manifest.permission.RECORD_AUDIO
-      ) != PackageManager.PERMISSION_GRANTED
-    ) {
-      ActivityCompat.requestPermissions(context as Activity, permissions, 200)
-      return false
     }
 
-    val numBytes = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+    private fun processSamples() {
+        val buffer = ShortArray((0.3 * sampleRateInHz).toInt())
 
-    audioRecord = AudioRecord(
-      MediaRecorder.AudioSource.MIC,
-      sampleRateInHz,
-      channelConfig,
-      audioFormat,
-      numBytes * 2 // a sample has two bytes as we are using 16-bit PCM
-    )
-    return true
-  }
+        while (isRecording) {
+            val ret = audioRecord?.read(buffer, 0, buffer.size)
 
-  fun initModel(context: Context) {
-    val featConfig = getFeatureExtractorConfig(
-      sampleRate = 16000.0f,
-      featureDim = 80
-    )
-    //Please change the argument "type" if you use a different model
-    val modelConfig = getModelConfig(type = 1, useGPU = true)!!
-    val decoderConfig = getDecoderConfig(method = "greedy_search", numActivePaths = 4)
+            if (ret != null && ret > 0) {
+                val samples = FloatArray(ret) { buffer[it] / 32768.0f }
 
-    val config = RecognizerConfig(
-      featConfig = featConfig,
-      modelConfig = modelConfig,
-      decoderConfig = decoderConfig,
-      enableEndpoint = true,
-      rule1MinTrailingSilence = 2.0f,
-      rule2MinTrailingSilence = 0.8f,
-      rule3MinUtteranceLength = 20.0f,
-    )
+                model.acceptSamples(samples)
 
-    model = SherpaNcnn(
-      assetManager = context.assets,
-      config = config
-    )
-  }
+                while (model.isReady()) {
+                    model.decode()
+                }
+                if (model.isEndpoint()) {
+                    model.reset()
+                    model.text.takeIf { it.isNotBlank() }?.let { text ->
+                        embeddingUtil.embedText(text)?.let { vectorUtil.store(text, it) }
+                    }
+                }
+            }
+        }
+    }
 
+    private fun initMicrophone(context: Context): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                200
+            )
+
+            return false
+        }
+
+        audioRecord = AudioRecord(
+            MediaRecorder.AudioSource.MIC,
+            sampleRateInHz,
+            channelConfig,
+            audioFormat,
+            AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat) * 2
+        )
+
+        return true
+    }
+
+    fun initModel(context: Context) {
+        val featConfig = getFeatureExtractorConfig(
+            sampleRate = 16000.0f,
+            featureDim = 80
+        )
+        val modelConfig = getModelConfig(type = 1, useGPU = true)!!
+        val decoderConfig = getDecoderConfig(method = "greedy_search", numActivePaths = 4)
+
+        val config = RecognizerConfig(
+            featConfig = featConfig,
+            modelConfig = modelConfig,
+            decoderConfig = decoderConfig,
+            enableEndpoint = true,
+            rule1MinTrailingSilence = 2.0f,
+            rule2MinTrailingSilence = 0.8f,
+            rule3MinUtteranceLength = 20.0f,
+        )
+
+        model = SherpaNcnn(config, context.assets)
+    }
 }
