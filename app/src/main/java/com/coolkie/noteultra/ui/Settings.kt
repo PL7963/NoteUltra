@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -76,6 +78,8 @@ class SettingsActivity : ComponentActivity() {
 
     enableEdgeToEdge()
     setContent {
+      val recordingState by repository.recordingStateFlow.collectAsState(repository.recordingStateInitial())
+      val recordingOnBoot by repository.recordingOnBootFlow.collectAsState(repository.recordingOnBootInitial())
       val llmMode by repository.llmModeFlow.collectAsState(repository.llmModeInitial())
       val darkTheme by repository.darkThemeFlow.collectAsState(repository.darkThemeInitial())
 
@@ -106,6 +110,42 @@ class SettingsActivity : ComponentActivity() {
               .padding(innerPadding)
               .verticalScroll(rememberScrollState())
           ) {
+            SettingCategory(stringResource(R.string.settings_category_service))
+
+            SettingItem(
+              title = stringResource(R.string.settings_item_recording_state_title),
+              description = stringResource(R.string.settings_item_recrding_state_description),
+              onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                  repository.setRecordingState(!recordingState)
+                }
+              },
+              content = {
+                Switch(
+                  checked = recordingState,
+                  onCheckedChange = null
+                )
+              }
+            )
+
+            AnimatedVisibility(recordingState) {
+              SettingItem(
+                title = stringResource(R.string.settings_item_recording_on_boot_title),
+                description = stringResource(R.string.settings_item_recrding_on_boot_description),
+                onClick = {
+                  CoroutineScope(Dispatchers.IO).launch {
+                    repository.setRecordingOnBoot(!recordingOnBoot)
+                  }
+                },
+                content = {
+                  Switch(
+                    checked = recordingOnBoot,
+                    onCheckedChange = null
+                  )
+                }
+              )
+            }
+
             SettingCategory(stringResource(R.string.settings_category_ai))
 
             SettingItem(
@@ -279,36 +319,49 @@ fun SettingCategory(text: String) {
 inline fun SettingItem(
   title: String,
   description: String,
-  dialogTitle: String,
-  crossinline dialogContent: @Composable (closeDialog: () -> Unit) -> Unit,
+  crossinline onClick: () -> Unit = {},
+  crossinline content: @Composable () -> Unit = {},
+  dialogTitle: String? = null,
+  crossinline dialogContent: @Composable (closeDialog: () -> Unit) -> Unit = {},
 ) {
   val isDialogDisplay = remember { mutableStateOf(false) }
 
   Box(
-    contentAlignment = Alignment.CenterStart,
     modifier = Modifier
       .fillMaxWidth()
       .clickable {
         isDialogDisplay.value = true
+        onClick()
       }
   ) {
-    Column(
+    Row(
       modifier = Modifier
-        .padding(horizontal = 24.dp, vertical = 12.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 24.dp, vertical = 12.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = title,
-        style = MaterialTheme.typography.bodyLarge
-      )
-      Text(
-        text = description,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodyMedium
-      )
+      Column(
+        modifier = Modifier
+          .weight(1f)
+      ) {
+        Text(
+          text = title,
+          style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+          modifier = Modifier
+            .padding(end = 8.dp),
+          text = description,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          style = MaterialTheme.typography.bodyMedium
+        )
+      }
+      content()
     }
   }
 
-  if (isDialogDisplay.value) {
+  if (dialogTitle != null && isDialogDisplay.value) {
     BasicAlertDialog({
       isDialogDisplay.value = false
     }) {
@@ -341,7 +394,7 @@ inline fun SettingItemOption(
   isChecked: Boolean,
   crossinline onClick: () -> Unit,
   text: String,
-  moreContent: @Composable (modifier: Modifier) -> Unit = {}
+  content: @Composable (modifier: Modifier) -> Unit = {}
 ) {
   Column(
     modifier = Modifier
@@ -378,7 +431,7 @@ inline fun SettingItemOption(
         modifier = Modifier.padding(start = 8.dp)
       )
     }
-    moreContent(
+    content(
       Modifier
         .fillMaxWidth()
         .padding(horizontal = 12.dp)

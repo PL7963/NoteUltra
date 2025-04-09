@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -34,6 +35,8 @@ class SettingsRepository(
     private val dataStore: DataStore<Preferences>
 ) {
     private object PreferencesKeys {
+        val RECORDING_STATE = booleanPreferencesKey("recording_state")
+        val RECORDING_ON_BOOT = booleanPreferencesKey("recording_on_boot")
         val LLM_MODE = stringPreferencesKey("llm_mode")
         val LLM_PATH = stringPreferencesKey("llm_path")
         val LLM_URL = stringPreferencesKey("llm_url")
@@ -48,6 +51,14 @@ class SettingsRepository(
                 throw exception
             }
         }
+    }
+
+    private fun Preferences.toRecordingState(): Boolean {
+        return this[PreferencesKeys.RECORDING_STATE] ?: true
+    }
+
+    private fun Preferences.toRecordingOnBoot(): Boolean {
+        return this[PreferencesKeys.RECORDING_ON_BOOT] ?: true
     }
 
     private fun Preferences.toLlmMode(): LlmMode {
@@ -67,9 +78,30 @@ class SettingsRepository(
     }
 
 
+    fun recordingStateInitial(): Boolean = runBlocking {
+        dataStore.data.first().toRecordingState()
+    }
+
+    val recordingStateFlow: Flow<Boolean> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toRecordingState()
+        }
+
+    fun recordingOnBootInitial(): Boolean = runBlocking {
+        dataStore.data.first().toRecordingOnBoot()
+    }
+
+    val recordingOnBootFlow: Flow<Boolean> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toRecordingOnBoot()
+        }
+
     fun llmModeInitial(): LlmMode = runBlocking {
         dataStore.data.first().toLlmMode()
     }
+
     val llmModeFlow: Flow<LlmMode> = dataStore.data
         .catchIOException()
         .map { preferences ->
@@ -79,6 +111,7 @@ class SettingsRepository(
     fun llmPathInitial(): String = runBlocking {
         dataStore.data.first().toLlmPath()
     }
+
     val llmPathFlow: Flow<String> = dataStore.data
         .catchIOException()
         .map { preferences ->
@@ -88,6 +121,7 @@ class SettingsRepository(
     fun llmUrlInitial(): String = runBlocking {
         dataStore.data.first().toLlmUrl()
     }
+
     val llmUrlFlow: Flow<String> = dataStore.data
         .catchIOException()
         .map { preferences ->
@@ -97,12 +131,25 @@ class SettingsRepository(
     fun darkThemeInitial(): DarkTheme = runBlocking {
         dataStore.data.first().toDarkTheme()
     }
+
     val darkThemeFlow: Flow<DarkTheme> = dataStore.data
         .catchIOException()
         .map { preferences ->
             preferences.toDarkTheme()
         }
 
+
+    suspend fun setRecordingState(state: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.RECORDING_STATE] = state
+        }
+    }
+
+    suspend fun setRecordingOnBoot(state: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.RECORDING_ON_BOOT] = state
+        }
+    }
 
     suspend fun setLlmMode(mode: LlmMode) {
         dataStore.edit { preferences ->

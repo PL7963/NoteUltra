@@ -36,9 +36,14 @@
     <string name="settings_clear_data_close_button">Cancel</string>
     <string name="settings_clear_data_delete_button">Clear</string>
     <string name="settings_clear_data_setting">Setting</string>
-    <string name="service_recording_setting_description">Shown when the background recording service is running.</string>
-    <string name="service_recording_setting_title">Background Recording</string>
-    <string name="service_recording_notify_text">Background recording</string>
+    <string name="service_recording_setting_description">Shown when the speech recognition service is running.</string>
+    <string name="service_recording_setting_title">Speech Recognition</string>
+    <string name="service_recording_notify_text">Speech recognition</string>
     <string name="service_recording_toast">No recording permission</string>
     <string name="service_recording_notify_big_text">Background recording service is running</string>
+    <string name="settings_item_recording_state_title">Speech recognition</string>
+    <string name="settings_item_recrding_state_description">Enable speech-to-text. This service runs in the background and requires permission.</string>
+    <string name="settings_item_recording_on_boot_title">Enable speech recognition on boot</string>
+    <string name="settings_item_recrding_on_boot_description">Enable this feature to automatically start the speech recognition service on device boot.</string>
+    <string name="settings_category_service">Service</string>
 </resources>
