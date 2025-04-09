@@ -34,7 +34,11 @@ class MainActivity : ComponentActivity() {
             if (permissions.all { it.value }) {
                 startService(Intent(this, ForegroundRecordingService::class.java))
             } else {
-                Toast.makeText(this, "未允許錄音權限", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.service_recording_toast),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 

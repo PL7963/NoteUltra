@@ -36,4 +36,9 @@
     <string name="settings_clear_data_setting">使用者設定</string>
     <string name="settings_clear_data_notes">所有筆記</string>
     <string name="settings_clear_data_transcript">語音轉錄稿</string>
+    <string name="service_recording_setting_description">背景錄音服務運作時顯示此通知。</string>
+    <string name="service_recording_notify_text">背景錄音</string>
+    <string name="service_recording_notify_big_text">背景錄音服務運作中</string>
+    <string name="service_recording_toast">未允許錄音權限</string>
+    <string name="service_recording_setting_title">背景錄音</string>
 </resources>

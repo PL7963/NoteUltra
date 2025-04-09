@@ -36,8 +36,11 @@ class ForegroundRecordingService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel =
-                NotificationChannel(CHANNEL_ID, "背景錄音", importance).apply {
-                    description = "背景錄音服務運作時會顯示此通知。"
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.service_recording_setting_title), importance
+                ).apply {
+                    description = getString(R.string.service_recording_setting_description)
                 }
             val notificationManager: NotificationManager =
                 getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -70,13 +73,14 @@ class ForegroundRecordingService : Service() {
 
     private fun createNotification(): Notification {
         val intent = Intent(this, MainActivity::class.java)
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("NoteUltra")
-            .setContentText("背景服務已啟動...")
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.service_recording_notify_text))
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("背景服務已啟動...")
+                    .bigText(getString(R.string.service_recording_notify_big_text))
             )
             .setContentIntent(
                 PendingIntent.getActivity(

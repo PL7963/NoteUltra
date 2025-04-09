@@ -36,4 +36,9 @@
     <string name="settings_clear_data_close_button">Cancel</string>
     <string name="settings_clear_data_delete_button">Clear</string>
     <string name="settings_clear_data_setting">Setting</string>
+    <string name="service_recording_setting_description">Shown when the background recording service is running.</string>
+    <string name="service_recording_setting_title">Background Recording</string>
+    <string name="service_recording_notify_text">Background recording</string>
+    <string name="service_recording_toast">No recording permission</string>
+    <string name="service_recording_notify_big_text">Background recording service is running</string>
 </resources>
