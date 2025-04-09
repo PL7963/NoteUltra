@@ -1,9 +1,13 @@
 package com.coolkie.noteultra.utils.asr
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import androidx.core.app.ActivityCompat
 import com.coolkie.noteultra.utils.EmbeddingUtils
 import com.coolkie.noteultra.utils.VectorUtils
 import com.k2fsa.sherpa.ncnn.RecognizerConfig
@@ -28,15 +32,27 @@ class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils)
     @Volatile
     private var isRecording: Boolean = false
 
-    fun startRecording() {
+    fun startRecording(context: Context) {
         if (!isRecording) {
-            audioRecord = AudioRecord(
-                MediaRecorder.AudioSource.MIC,
-                sampleRateInHz,
-                channelConfig,
-                audioFormat,
-                AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat) * 2
-            )
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    context as Activity,
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    200
+                )
+            } else {
+                audioRecord = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    sampleRateInHz,
+                    channelConfig,
+                    audioFormat,
+                    AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat) * 2
+                )
+            }
             audioRecord!!.startRecording()
             isRecording = true
             recordingThread = thread(true) {
@@ -70,10 +86,10 @@ class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils)
                     model.decode()
                 }
                 if (model.isEndpoint()) {
-                    model.reset()
                     model.text.takeIf { it.isNotBlank() }?.let { text ->
                         embeddingUtil.embedText(text)?.let { vectorUtil.store(text, it) }
                     }
+                    model.reset()
                 }
             }
         }

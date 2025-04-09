@@ -1,14 +1,13 @@
 package com.coolkie.noteultra.service
 
-import android.Manifest
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.os.Build
 import android.os.IBinder
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.coolkie.noteultra.MainActivity
 import com.coolkie.noteultra.NoteUltraApp
@@ -29,9 +28,21 @@ class ForegroundRecordingService : Service() {
 
         val app = application as NoteUltraApp
         val vectorUtils = app.vectorUtils
+
         textEmbeddingUtils = EmbeddingUtils(this)
         voiceRecognition = VoiceRecognition(vectorUtils, textEmbeddingUtils)
         voiceRecognition.initModel(this)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel =
+                NotificationChannel(CHANNEL_ID, "背景錄音", importance).apply {
+                    description = "背景錄音服務運作時會顯示此通知。"
+                }
+            val notificationManager: NotificationManager =
+                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     override fun onStartCommand(
@@ -41,18 +52,8 @@ class ForegroundRecordingService : Service() {
     ): Int {
         super.onStartCommand(intent, flags, startId)
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Toast.makeText(this, "未允許錄音權限", Toast.LENGTH_SHORT).show()
-            stopSelf()
-
-            return START_NOT_STICKY
-        }
         startForeground(1, createNotification())
-        voiceRecognition.startRecording()
+        voiceRecognition.startRecording(this)
 
         return START_STICKY
     }
@@ -63,6 +64,7 @@ class ForegroundRecordingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         voiceRecognition.stopRecording()
     }
 
@@ -71,10 +73,10 @@ class ForegroundRecordingService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("NoteUltra")
-            .setContentText("前景服務已啟動...")
+            .setContentText("背景服務已啟動...")
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("前景服務已啟動...")
+                    .bigText("背景服務已啟動...")
             )
             .setContentIntent(
                 PendingIntent.getActivity(
