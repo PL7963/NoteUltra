@@ -144,18 +144,3 @@ class LlmInferenceUtils(
         }
     }
 }
-
-
-//class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
-//    fun answerUserQuestion(
-//        userQueryLast3: List<String>,
-//        llmResponseLast3: List<String>,
-//        userQuery: String
-//    ): String {
-//        return ""
-//    }
-//
-//    fun generateNotes(message: String): Array<String> {
-//        return arrayOf("", "")
-//    }
-//}

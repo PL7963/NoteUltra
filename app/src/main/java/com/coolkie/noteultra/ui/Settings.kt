@@ -153,8 +153,8 @@ class SettingsActivity : ComponentActivity() {
               description = stringResource(R.string.settings_item_llm_settings_description),
               dialogTitle = stringResource(R.string.settings_item_llm_settings_title)
             ) {
-              val llmPath = remember { mutableStateOf(repository.llmPathInitial()) }
-              val llmUrl = remember { mutableStateOf(repository.llmUrlInitial()) }
+              val llmPath = remember { mutableStateOf(repository.localLlmConfigInitial().path) }
+              val llmUrl = remember { mutableStateOf(repository.remoteLlmConfigInitial()) }
 
               LlmMode.entries.forEach { mode ->
                 SettingItemOption(
