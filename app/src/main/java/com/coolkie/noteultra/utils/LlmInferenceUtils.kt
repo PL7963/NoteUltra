@@ -10,54 +10,57 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
-class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
+class LlmInferenceUtils(
+    context: Context,
+    vectorUtils: VectorUtils
+) {
     private val llmInference: LlmInference by lazy {
         val options = LlmInference.LlmInferenceOptions.builder()
-            .setModelPath(model)
+            .setModelPath(localLlmConfig.path)
             .setMaxTokens(4096)
             .build()
         LlmInference.createFromOptions(context, options)
     }
     private val remoteInference: RemoteInferenceUtils by lazy { RemoteInferenceUtils() }
     private val repository = SettingsRepository(context.dataStore)
-    private var llmMode:LlmMode = repository.llmModeInitial()
-    private var model = "/data/local/tmp/llm/model.bin"
-
     private val embeddingUtils = EmbeddingUtils(context)
     private val vectorUtil = vectorUtils
+    private var llmMode = repository.llmModeInitial()
+    private var localLlmConfig = repository.localLlmConfigInitial()
+    private var remoteLlmConfig = repository.remoteLlmConfigInitial()
 
     @Serializable
-    data class promptUser(
+    data class PromptUser(
+        val prompt: String,
         val question: String,
         val context: List<String>,
         val chatHistory: List<Pair<String, String>> = emptyList()
     )
 
     init {
-      CoroutineScope(Dispatchers.IO).launch {
-          repository.llmModeFlow.collect { mode ->
-              llmMode = mode
-          }
-          repository.llmPathFlow.collect { path ->
-              model = path
-          }
-          repository.llmUrlFlow.collect { url ->
-              model = url
-          }
-      }
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.llmModeFlow.collect {
+                llmMode = it
+            }
+            repository.localLlmConfig.collect {
+                localLlmConfig = it
+            }
+            repository.remoteLlmConfig.collect {
+                remoteLlmConfig = it
+            }
+        }
     }
 
-    suspend fun answerUserQuestion(
+    fun answerUserQuestion(
         userQueryLast3: List<String>,
         llmResponseLast3: List<String>,
         userQuery: String
     ): String {
         val embeddedText = embeddingUtils.embedText(userQuery)
         val relatedResults = embeddedText?.let { vectorUtil.search(it) }
-
         val chatHistory = userQueryLast3.zip(llmResponseLast3)
-
-        val prompt = promptUser(
+        val prompt = PromptUser(
+            prompt = localLlmConfig.questionPrompt,
             question = userQuery,
             context = relatedResults ?: emptyList(),
             chatHistory = chatHistory
@@ -66,62 +69,93 @@ class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
         return generateResponse(prompt)
     }
 
-    suspend fun generateNotes(message: String): Array<String> {
+    fun generateNotes(message: String): Array<String> {
         return generateResponse(message)
     }
 
-    /* For answsering question */
-    fun generateResponse(prompt: promptUser): String {
-        if (llmMode == LlmMode.LOCAL) {
-            val query = StringBuilder().apply {
-                append("<start_of_turn>$prompt<end_of_turn>")
-                prompt.context?.forEach { result ->
-                    append("<start_of_turn>$result<end_of_turn>")
-                }
-                prompt.chatHistory
-                    .forEach { (userQuery, llmResponse) ->
-                        append("<start_of_turn>$userQuery<end_of_turn>")
-                        append("<start_of_turn>$llmResponse<end_of_turn>")
+    /* For answering question */
+    private fun generateResponse(prompt: PromptUser): String {
+        when (llmMode) {
+            LlmMode.LOCAL -> {
+                val start = localLlmConfig.startTag
+                val end = localLlmConfig.endTag
+
+                val query = StringBuilder().apply {
+                    append("${start}${prompt}${end}")
+                    prompt.context.forEach { result ->
+                        append("${start}${result}${end}")
                     }
-                append("<start_of_turn>USER: ${prompt.question}<end_of_turn>")
-                append("<start_of_turn>Assistant:")
+                    prompt.chatHistory
+                        .forEach { (userQuery, llmResponse) ->
+                            append("${start}${userQuery}${end}")
+                            append("${start}${llmResponse}${end}")
+                        }
+                    append("${start}USER: ${prompt.question}${end}")
+                    append("${start}Assistant:")
+                }
+
+                return llmInference.generateResponse(query.toString())
             }
 
-            return llmInference.generateResponse(query.toString())
-        }
-        else if (llmMode == LlmMode.REMOTE) {
-            return remoteInference.generateResponse(prompt, model)
-        }
+            LlmMode.REMOTE -> {
+                return remoteInference.generateResponse(prompt, remoteLlmConfig)
+            }
 
-        return "LLM_DISABLED"
+            LlmMode.DISABLE -> {
+                return "LLM_DISABLED"
+            }
+        }
     }
 
-    /* For summary */
-    fun generateResponse(message: String): Array<String> {
-        if (llmMode == LlmMode.LOCAL) {
-            val promptTitle = "請把USER說的句子簡化成標題，盡可能的簡短"
-            val toLlmTitle = StringBuilder().apply {
-                append("<start_of_turn>$promptTitle<end_of_turn>")
-                append("<start_of_turn>USER: $message<end_of_turn>")
-                append("<start_of_turn>Title: ")
+    /* For summary note */
+    private fun generateResponse(message: String): Array<String> {
+        when (llmMode) {
+            LlmMode.LOCAL -> {
+                val start = localLlmConfig.startTag
+                val end = localLlmConfig.endTag
+
+                val promptTitle = "請把USER說的句子簡化成標題，盡可能的簡短"
+                val toLlmTitle = StringBuilder().apply {
+                    append("${start}$promptTitle${end}")
+                    append("${start}USER: $message${end}")
+                    append("${start}Title: ")
+                }
+                val title = llmInference.generateResponse(toLlmTitle.toString())
+
+                val promptContent = "請把USER說的句子生成重點"
+                val toLlmContent = StringBuilder().apply {
+                    append("${start}$promptContent${end}")
+                    append("${start}USER: $message${end}")
+                    append("${start}Content: ")
+                }
+
+                val content = llmInference.generateResponse(toLlmContent.toString())
+
+                return arrayOf(title, content)
             }
-            val title = llmInference.generateResponse(toLlmTitle.toString())
 
-            val promptContent = "請把USER說的句子生成重點"
-            val toLlmContent = StringBuilder().apply {
-                append("<start_of_turn>$promptContent<end_of_turn>")
-                append("<start_of_turn>USER: $message<end_of_turn>")
-                append("<start_of_turn>Content: ")
+            LlmMode.REMOTE -> {
+                return remoteInference.generateResponse(message, remoteLlmConfig)
             }
 
-            val content = llmInference.generateResponse(toLlmContent.toString())
-
-            return arrayOf(title, content)
+            LlmMode.DISABLE -> {
+                return arrayOf("LLM_DISABLED", "LLM_DISABLED")
+            }
         }
-        else if (llmMode == LlmMode.REMOTE) {
-            return remoteInference.generateResponse(message, model)
-        }
-
-        return arrayOf("LLM_DISABLED", "LLM_DISABLED")
     }
 }
+
+
+//class LlmInferenceUtils(context: Context, vectorUtils: VectorUtils) {
+//    fun answerUserQuestion(
+//        userQueryLast3: List<String>,
+//        llmResponseLast3: List<String>,
+//        userQuery: String
+//    ): String {
+//        return ""
+//    }
+//
+//    fun generateNotes(message: String): Array<String> {
+//        return arrayOf("", "")
+//    }
+//}

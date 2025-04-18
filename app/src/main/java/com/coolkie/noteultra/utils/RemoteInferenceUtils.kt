@@ -1,19 +1,26 @@
 package com.coolkie.noteultra.utils
 
+import com.coolkie.noteultra.utils.LlmInferenceUtils.PromptUser
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import com.coolkie.noteultra.utils.LlmInferenceUtils.promptUser
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class RemoteInferenceUtils {
     private val client = OkHttpClient()
 
-    data class result(val response: String)
+    data class Result(
+        val response: String
+    )
 
-    fun generateResponse(prompt: promptUser, url: String): String {
+    data class SummaryResult(
+        val title: String,
+        val summary: String
+    )
+
+    fun generateResponse(prompt: PromptUser, url: String): String {
         val body = Json.encodeToString(prompt)
 
         val request = Request.Builder()
@@ -22,15 +29,14 @@ class RemoteInferenceUtils {
             .build()
 
         client.newCall(request).execute().use { jsonResponse ->
-            if (!jsonResponse.isSuccessful) return "發生錯誤 $jsonResponse"
+            if (!jsonResponse.isSuccessful) return "ERROR_$jsonResponse"
 
-            val response = Json.decodeFromString<result>(jsonResponse.body!!.string())
+            val response = Json.decodeFromString<Result>(jsonResponse.body!!.string())
 
             return Json.decodeFromString(response.toString())
         }
     }
 
-    data class summaryResult(val title: String, val summary: String)
     fun generateResponse(context: String, url: String): Array<String> {
         val body = Json.encodeToString(context)
 
@@ -45,7 +51,7 @@ class RemoteInferenceUtils {
                 "ERROR_$jsonResponse"
             )
 
-            val response = Json.decodeFromString<summaryResult>(jsonResponse.body!!.string())
+            val response = Json.decodeFromString<SummaryResult>(jsonResponse.body!!.string())
             return arrayOf(response.title, response.summary)
         }
     }
