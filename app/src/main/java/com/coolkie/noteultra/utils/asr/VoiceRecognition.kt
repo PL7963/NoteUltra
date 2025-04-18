@@ -46,7 +46,7 @@ class VoiceRecognition(vectorUtils: VectorUtils, embeddingUtils: EmbeddingUtils)
                 )
             } else {
                 audioRecord = AudioRecord(
-                    MediaRecorder.AudioSource.MIC,
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION,
                     sampleRateInHz,
                     channelConfig,
                     audioFormat,
