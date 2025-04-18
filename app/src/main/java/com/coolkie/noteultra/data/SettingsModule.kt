@@ -31,6 +31,15 @@ enum class DarkTheme(@StringRes val labelResId: Int) {
     SYSTEM(R.string.settings_dark_theme_system)
 }
 
+data class LocalLlmConfig(
+    val path: String,
+    val startTag: String,
+    val endTag: String,
+    val questionPrompt: String,
+    val noteTitlePrompt: String,
+    val noteContentPrompt: String
+)
+
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>
 ) {
@@ -41,6 +50,19 @@ class SettingsRepository(
         val LLM_PATH = stringPreferencesKey("llm_path")
         val LLM_URL = stringPreferencesKey("llm_url")
         val DARK_THEME = stringPreferencesKey("dark_theme")
+
+        object LocalLLM {
+            val PATH = stringPreferencesKey("local_llm_path")
+            val START_TAG = stringPreferencesKey("local_llm_start_tag")
+            val END_TAG = stringPreferencesKey("local_llm_end_tag")
+            val QUESTION_PROMPT = stringPreferencesKey("local_llm_question_prompt")
+            val NOTE_TITLE_PROMPT = stringPreferencesKey("local_llm_note_title_prompt")
+            val NOTE_CONTENT_PROMPT = stringPreferencesKey("local_llm_note_content_prompt")
+        }
+
+        object RemoteLLM {
+            val URL = stringPreferencesKey("remote_llm_url")
+        }
     }
 
     private fun Flow<Preferences>.catchIOException(): Flow<Preferences> {
@@ -77,6 +99,26 @@ class SettingsRepository(
         return DarkTheme.valueOf(this[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
     }
 
+    private fun Preferences.toLocalLlmConfig(): LocalLlmConfig {
+        return LocalLlmConfig(
+            path = this[PreferencesKeys.LocalLLM.PATH]
+                ?: "/data/local/tmp/llm/model.bin",
+            startTag = this[PreferencesKeys.LocalLLM.START_TAG]
+                ?: "<start_of_turn>",
+            endTag = this[PreferencesKeys.LocalLLM.END_TAG]
+                ?: "<end_of_turn>",
+            questionPrompt = this[PreferencesKeys.LocalLLM.QUESTION_PROMPT]
+                ?: "請試著用以下文本與USER交談，如果文本與USER無關請自行回答USER",
+            noteTitlePrompt = this[PreferencesKeys.LocalLLM.NOTE_TITLE_PROMPT]
+                ?: "請把USER說的句子簡化成標題，盡可能的簡短",
+            noteContentPrompt = this[PreferencesKeys.LocalLLM.NOTE_CONTENT_PROMPT]
+                ?: "請把USER說的句子生成重點"
+        )
+    }
+
+    private fun Preferences.toRemoteLolConfig(): String {
+        return this[PreferencesKeys.RemoteLLM.URL] ?: ""
+    }
 
     fun recordingStateInitial(): Boolean = runBlocking {
         dataStore.data.first().toRecordingState()
@@ -108,26 +150,6 @@ class SettingsRepository(
             preferences.toLlmMode()
         }
 
-    fun llmPathInitial(): String = runBlocking {
-        dataStore.data.first().toLlmPath()
-    }
-
-    val llmPathFlow: Flow<String> = dataStore.data
-        .catchIOException()
-        .map { preferences ->
-            preferences.toLlmPath()
-        }
-
-    fun llmUrlInitial(): String = runBlocking {
-        dataStore.data.first().toLlmUrl()
-    }
-
-    val llmUrlFlow: Flow<String> = dataStore.data
-        .catchIOException()
-        .map { preferences ->
-            preferences.toLlmUrl()
-        }
-
     fun darkThemeInitial(): DarkTheme = runBlocking {
         dataStore.data.first().toDarkTheme()
     }
@@ -136,6 +158,26 @@ class SettingsRepository(
         .catchIOException()
         .map { preferences ->
             preferences.toDarkTheme()
+        }
+
+    fun localLlmConfigInitial(): LocalLlmConfig = runBlocking {
+        dataStore.data.first().toLocalLlmConfig()
+    }
+
+    val localLlmConfig: Flow<LocalLlmConfig> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toLocalLlmConfig()
+        }
+
+    fun remoteLlmConfigInitial(): String = runBlocking {
+        dataStore.data.first().toRemoteLolConfig()
+    }
+
+    val remoteLlmConfig: Flow<String> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toRemoteLolConfig()
         }
 
 
