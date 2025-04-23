@@ -42,10 +42,14 @@ class LlmInferenceUtils(
             repository.llmModeFlow.collect {
                 llmMode = it
             }
-            repository.localLlmConfig.collect {
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.localLlmConfigFlow.collect {
                 localLlmConfig = it
             }
-            repository.remoteLlmConfig.collect {
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.remoteLlmConfigFlow.collect {
                 remoteLlmConfig = it
             }
         }
@@ -81,7 +85,7 @@ class LlmInferenceUtils(
                 val end = localLlmConfig.endTag
 
                 val query = StringBuilder().apply {
-                    append("${start}${prompt}${end}")
+                    append("${start}${prompt.prompt}${end}")
                     prompt.context.forEach { result ->
                         append("${start}${result}${end}")
                     }
@@ -114,7 +118,7 @@ class LlmInferenceUtils(
                 val start = localLlmConfig.startTag
                 val end = localLlmConfig.endTag
 
-                val promptTitle = "請把USER說的句子簡化成標題，盡可能的簡短"
+                val promptTitle = localLlmConfig.noteTitlePrompt
                 val toLlmTitle = StringBuilder().apply {
                     append("${start}$promptTitle${end}")
                     append("${start}USER: $message${end}")
@@ -122,7 +126,7 @@ class LlmInferenceUtils(
                 }
                 val title = llmInference.generateResponse(toLlmTitle.toString())
 
-                val promptContent = "請把USER說的句子生成重點"
+                val promptContent = localLlmConfig.noteContentPrompt
                 val toLlmContent = StringBuilder().apply {
                     append("${start}$promptContent${end}")
                     append("${start}USER: $message${end}")

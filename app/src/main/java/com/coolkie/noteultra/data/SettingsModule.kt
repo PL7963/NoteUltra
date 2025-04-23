@@ -47,8 +47,6 @@ class SettingsRepository(
         val RECORDING_STATE = booleanPreferencesKey("recording_state")
         val RECORDING_ON_BOOT = booleanPreferencesKey("recording_on_boot")
         val LLM_MODE = stringPreferencesKey("llm_mode")
-        val LLM_PATH = stringPreferencesKey("llm_path")
-        val LLM_URL = stringPreferencesKey("llm_url")
         val DARK_THEME = stringPreferencesKey("dark_theme")
 
         object LocalLLM {
@@ -85,14 +83,6 @@ class SettingsRepository(
 
     private fun Preferences.toLlmMode(): LlmMode {
         return LlmMode.valueOf(this[PreferencesKeys.LLM_MODE] ?: LlmMode.DISABLE.name)
-    }
-
-    private fun Preferences.toLlmPath(): String {
-        return this[PreferencesKeys.LLM_PATH] ?: "/data/local/tmp/llm/model.bin"
-    }
-
-    private fun Preferences.toLlmUrl(): String {
-        return this[PreferencesKeys.LLM_URL] ?: "http://"
     }
 
     private fun Preferences.toDarkTheme(): DarkTheme {
@@ -164,7 +154,7 @@ class SettingsRepository(
         dataStore.data.first().toLocalLlmConfig()
     }
 
-    val localLlmConfig: Flow<LocalLlmConfig> = dataStore.data
+    val localLlmConfigFlow: Flow<LocalLlmConfig> = dataStore.data
         .catchIOException()
         .map { preferences ->
             preferences.toLocalLlmConfig()
@@ -174,7 +164,7 @@ class SettingsRepository(
         dataStore.data.first().toRemoteLolConfig()
     }
 
-    val remoteLlmConfig: Flow<String> = dataStore.data
+    val remoteLlmConfigFlow: Flow<String> = dataStore.data
         .catchIOException()
         .map { preferences ->
             preferences.toRemoteLolConfig()
@@ -199,15 +189,22 @@ class SettingsRepository(
         }
     }
 
-    suspend fun setLlmPath(path: String) {
+    suspend fun setLocalLlmConfig(
+        data: LocalLlmConfig
+    ) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LLM_PATH] = path
+            preferences[PreferencesKeys.LocalLLM.PATH] = data.path
+            preferences[PreferencesKeys.LocalLLM.START_TAG] = data.startTag
+            preferences[PreferencesKeys.LocalLLM.END_TAG] = data.endTag
+            preferences[PreferencesKeys.LocalLLM.QUESTION_PROMPT] = data.questionPrompt
+            preferences[PreferencesKeys.LocalLLM.NOTE_TITLE_PROMPT] = data.noteTitlePrompt
+            preferences[PreferencesKeys.LocalLLM.NOTE_CONTENT_PROMPT] = data.noteContentPrompt
         }
     }
 
-    suspend fun setLlmUrl(url: String) {
+    suspend fun setRemoteLlmConfig(url: String) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LLM_URL] = url
+            preferences[PreferencesKeys.RemoteLLM.URL] = url
         }
     }
 

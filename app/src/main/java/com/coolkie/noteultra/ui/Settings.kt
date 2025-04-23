@@ -48,6 +48,7 @@ import com.coolkie.noteultra.NoteUltraApp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.DarkTheme
 import com.coolkie.noteultra.data.LlmMode
+import com.coolkie.noteultra.data.LocalLlmConfig
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.data.NoteViewModelFactory
 import com.coolkie.noteultra.data.NotesDatabase
@@ -173,7 +174,16 @@ class SettingsActivity : ComponentActivity() {
                         value = llmPath.value,
                         onValueChange = {
                           coroutineScope.launch {
-                            repository.setLlmPath(it)
+                            repository.setLocalLlmConfig(
+                              LocalLlmConfig(
+                                path = it,
+                                startTag = "<start_of_turn>",
+                                endTag = "<end_of_turn>",
+                                questionPrompt = "請試著用以下文本與USER交談，如果文本與USER無關請自行回答USER",
+                                noteTitlePrompt = "請把USER說的句子簡化成標題，盡可能的簡短",
+                                noteContentPrompt = "請把USER說的句子生成重點"
+                              )
+                            )
                           }
 
                           llmPath.value = it
@@ -190,7 +200,7 @@ class SettingsActivity : ComponentActivity() {
                         value = llmUrl.value,
                         onValueChange = {
                           coroutineScope.launch {
-                            repository.setLlmUrl(it)
+                            repository.setRemoteLlmConfig(it)
                           }
 
                           llmUrl.value = it
