@@ -46,4 +46,23 @@
     <string name="settings_item_recording_on_boot_title">開機起動語音辨識</string>
     <string name="settings_item_recrding_on_boot_description">啟用此功能以在裝置啟動後自動執行語音轉文字服務。</string>
     <string name="settings_category_service">服務</string>
+    <string name="settings_local_llm_config_title">本地模型設定</string>
+    <string name="settings_local_llm_confing_close_button">關閉</string>
+    <string name="settings_local_llm_config_save_button">儲存</string>
+    <string name="settings_local_llm_settings_button">本地模型設定</string>
+    <string name="settings_local_llm_config_path">路徑</string>
+    <string name="settings_local_llm_config_start_tag">開始標籤</string>
+    <string name="settings_local_llm_config_end_tag">結束標籤</string>
+    <string name="settings_local_llm_config_question_prompt">問題提示詞</string>
+    <string name="settings_local_llm_config_note_title_prompt">筆記標題提示詞</string>
+    <string name="settings_local_llm_config_note_content_prompt">筆記內容提示詞</string>
+    <string name="settings_remote_llm_config_title">遠端模型設定</string>
+    <string name="settings_remote_llm_config_url">網址</string>
+    <string name="settings_remote_llm_settings_button">遠端模型設定</string>
+    <string name="settings_remote_llm_config_close_button">關閉</string>
+    <string name="settings_remote_llm_config_save_button">儲存</string>
+    <string name="settings_llm_source_close_button">關閉</string>
+    <string name="settings_llm_source_confirm_button">設定</string>
+    <string name="settings_llm_source_toast_local">請設定本地模型路徑</string>
+    <string name="settings_llm_source_toast_remote">請設定遠端模型網址</string>
 </resources>
