@@ -41,7 +41,7 @@ jobs:
 
     - name: Rename APK
       run: |
-        mv "$APK_FILE" app/build/outputs/apk/debug/NoteUltra.apk
+        APK_FILE=$(find app/build/outputs/apk/debug -name '*.apk' | head -n 1)
         echo "RENAMED_APK=app/build/outputs/apk/debug/NoteUltra.apk" >> $GITHUB_ENV
 
     - name: Upload APK as Artifact
