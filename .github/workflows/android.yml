@@ -8,10 +8,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.gradle/caches, ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -26,9 +34,9 @@ jobs:
     - name: Clean and Build with Gradle
       run: ./gradlew clean build
 
-    - name: Find APKs
+    - name: Find APK
       run: |
-        APK_FILE=$(find app/build/outputs/apk/debug -name '*.apk' | head -n 1)
+        APK_FILE="app/build/outputs/apk/debug/NoteUltra-debug.apk"
         echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
 
     - name: Rename APK
