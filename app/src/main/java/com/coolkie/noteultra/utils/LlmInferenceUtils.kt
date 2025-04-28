@@ -31,10 +31,9 @@ class LlmInferenceUtils(
 
     @Serializable
     data class PromptUser(
-        val prompt: String,
         val question: String,
         val context: List<String>,
-        val chatHistory: List<Pair<String, String>> = emptyList()
+        val chatHistory: List<Map<String, String>> = emptyList()
     )
 
     init {
@@ -62,9 +61,12 @@ class LlmInferenceUtils(
     ): String {
         val embeddedText = embeddingUtils.embedText(userQuery)
         val relatedResults = embeddedText?.let { vectorUtil.search(it) }
-        val chatHistory = userQueryLast3.zip(llmResponseLast3)
+        val chatHistory = userQueryLast3.zip(llmResponseLast3) { user, assistant ->
+            mapOf(
+                "USER" to user,
+                "ASSISTANT" to assistant)
+        }
         val prompt = PromptUser(
-            prompt = localLlmConfig.questionPrompt,
             question = userQuery,
             context = relatedResults ?: emptyList(),
             chatHistory = chatHistory
@@ -85,17 +87,16 @@ class LlmInferenceUtils(
                 val end = localLlmConfig.endTag
 
                 val query = StringBuilder().apply {
-                    append("${start}${prompt.prompt}${end}")
+                    append("${start}${localLlmConfig.questionPrompt}${end}")
                     prompt.context.forEach { result ->
                         append("${start}${result}${end}")
                     }
                     prompt.chatHistory
-                        .forEach { (userQuery, llmResponse) ->
-                            append("${start}${userQuery}${end}")
-                            append("${start}${llmResponse}${end}")
+                        .forEach {
+                            append("${start}$it${end}")
                         }
                     append("${start}USER: ${prompt.question}${end}")
-                    append("${start}Assistant:")
+                    append("${start}ASSISTANT:")
                 }
 
                 return llmInference.generateResponse(query.toString())
