@@ -141,7 +141,7 @@ class SettingsActivity : ComponentActivity() {
 
             SettingItem(
               title = stringResource(R.string.settings_item_recording_state_title),
-              description = stringResource(R.string.settings_item_recrding_state_description),
+              description = stringResource(R.string.settings_item_recording_state_description),
               state = recordingState,
               onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -206,7 +206,7 @@ class SettingsActivity : ComponentActivity() {
                                   ) {
                                     Icon(
                                       painter = painterResource(R.drawable.rounded_close_24),
-                                      contentDescription = stringResource(R.string.settings_local_llm_confing_close_button)
+                                      contentDescription = stringResource(R.string.settings_local_llm_config_close_button)
                                     )
                                   }
                                 },

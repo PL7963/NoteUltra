@@ -42,12 +42,12 @@
     <string name="service_recording_toast">未允許錄音權限</string>
     <string name="service_recording_setting_title">語音辨識</string>
     <string name="settings_item_recording_state_title">語音辨識</string>
-    <string name="settings_item_recrding_state_description">啟用此功能以執行語音轉文字。語音辨識服務將於背景運行（需授予相關權限）。</string>
+    <string name="settings_item_recording_state_description">啟用此功能以執行語音轉文字。語音辨識服務將於背景運行（需授予相關權限）。</string>
     <string name="settings_item_recording_on_boot_title">開機起動語音辨識</string>
-    <string name="settings_item_recrding_on_boot_description">啟用此功能以在裝置啟動後自動執行語音轉文字服務。</string>
+    <string name="settings_item_recording_on_boot_description">啟用此功能以在裝置啟動後自動執行語音轉文字服務。</string>
     <string name="settings_category_service">服務</string>
     <string name="settings_local_llm_config_title">本地模型設定</string>
-    <string name="settings_local_llm_confing_close_button">關閉</string>
+    <string name="settings_local_llm_config_close_button">關閉</string>
     <string name="settings_local_llm_config_save_button">儲存</string>
     <string name="settings_local_llm_settings_button">本地模型設定</string>
     <string name="settings_local_llm_config_path">路徑</string>

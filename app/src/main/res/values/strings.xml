@@ -42,12 +42,12 @@
     <string name="service_recording_toast">No recording permission</string>
     <string name="service_recording_notify_big_text">Background recording service is running</string>
     <string name="settings_item_recording_state_title">Speech recognition</string>
-    <string name="settings_item_recrding_state_description">Enable speech-to-text. This service runs in the background and requires permission.</string>
+    <string name="settings_item_recording_state_description">Enable speech-to-text. This service runs in the background and requires permission.</string>
     <string name="settings_item_recording_on_boot_title">Enable speech recognition on boot</string>
-    <string name="settings_item_recrding_on_boot_description">Enable this feature to automatically start the speech recognition service on device boot.</string>
+    <string name="settings_item_recording_on_boot_description">Enable this feature to automatically start the speech recognition service on device boot.</string>
     <string name="settings_category_service">Service</string>
-    <string name="settings_local_llm_config_title">Local LLM config settings</string>
-    <string name="settings_local_llm_confing_close_button">Close</string>
+    <string name="settings_local_llm_config_title">Local LLM settings</string>
+    <string name="settings_local_llm_config_close_button">Close</string>
     <string name="settings_local_llm_config_save_button">Save</string>
     <string name="settings_local_llm_settings_button">Local LLM config settings</string>
     <string name="settings_local_llm_config_path">PATH</string>
@@ -56,7 +56,7 @@
     <string name="settings_local_llm_config_question_prompt">QUESTION PROMPT</string>
     <string name="settings_local_llm_config_note_title_prompt">NOTE TITLE PROMPT</string>
     <string name="settings_local_llm_config_note_content_prompt">NOTE CONTENT PROMPT</string>
-    <string name="settings_remote_llm_config_title">Remote LLM config settings</string>
+    <string name="settings_remote_llm_config_title">Remote LLM settings</string>
     <string name="settings_remote_llm_config_close_button">Close</string>
     <string name="settings_remote_llm_config_save_button">Save</string>
     <string name="settings_remote_llm_config_url">URL</string>
