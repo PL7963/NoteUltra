@@ -45,7 +45,6 @@ class SettingsRepository(
 ) {
     private object PreferencesKeys {
         val RECORDING_STATE = booleanPreferencesKey("recording_state")
-        val RECORDING_ON_BOOT = booleanPreferencesKey("recording_on_boot")
         val LLM_MODE = stringPreferencesKey("llm_mode")
         val DARK_THEME = stringPreferencesKey("dark_theme")
 
@@ -75,10 +74,6 @@ class SettingsRepository(
 
     private fun Preferences.toRecordingState(): Boolean {
         return this[PreferencesKeys.RECORDING_STATE] ?: true
-    }
-
-    private fun Preferences.toRecordingOnBoot(): Boolean {
-        return this[PreferencesKeys.RECORDING_ON_BOOT] ?: true
     }
 
     private fun Preferences.toLlmMode(): LlmMode {
@@ -118,16 +113,6 @@ class SettingsRepository(
         .catchIOException()
         .map { preferences ->
             preferences.toRecordingState()
-        }
-
-    fun recordingOnBootInitial(): Boolean = runBlocking {
-        dataStore.data.first().toRecordingOnBoot()
-    }
-
-    val recordingOnBootFlow: Flow<Boolean> = dataStore.data
-        .catchIOException()
-        .map { preferences ->
-            preferences.toRecordingOnBoot()
         }
 
     fun llmModeInitial(): LlmMode = runBlocking {
@@ -174,12 +159,6 @@ class SettingsRepository(
     suspend fun setRecordingState(state: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.RECORDING_STATE] = state
-        }
-    }
-
-    suspend fun setRecordingOnBoot(state: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.RECORDING_ON_BOOT] = state
         }
     }
 

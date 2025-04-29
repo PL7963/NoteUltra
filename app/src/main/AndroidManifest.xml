@@ -38,14 +38,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.NoteUltra">
         </activity>
-        <uses-native-library android:name="libOpenCL.so" android:required="false" />
-        <uses-native-library android:name="libOpenCL-car.so" android:required="false"/>
-        <uses-native-library android:name="libOpenCL-pixel.so" android:required="false"/>
         <service
             android:name=".service.ForegroundRecordingService"
             android:exported="false"
             android:foregroundServiceType="microphone">
         </service>
+        <uses-native-library android:name="libOpenCL.so" android:required="false" />
+        <uses-native-library android:name="libOpenCL-car.so" android:required="false"/>
+        <uses-native-library android:name="libOpenCL-pixel.so" android:required="false"/>
     </application>
 
 </manifest>

@@ -1,13 +1,16 @@
 package com.coolkie.noteultra.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedVisibility
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.coolkie.noteultra.NoteUltraApp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.DarkTheme
@@ -47,6 +51,8 @@ import com.coolkie.noteultra.data.NoteViewModelFactory
 import com.coolkie.noteultra.data.NotesDatabase
 import com.coolkie.noteultra.data.SettingsRepository
 import com.coolkie.noteultra.data.dataStore
+import com.coolkie.noteultra.service.ForegroundRecordingService
+import com.coolkie.noteultra.service.initiateRecording
 import com.coolkie.noteultra.ui.components.FullScreenDialog
 import com.coolkie.noteultra.ui.components.Option
 import com.coolkie.noteultra.ui.components.OptionWithMoreButton
@@ -67,20 +73,36 @@ class SettingsActivity : ComponentActivity() {
   private val noteViewModel: NoteViewModel by viewModels {
     NoteViewModelFactory(NotesDatabase.getDatabase(applicationContext))
   }
+  private lateinit var repository: SettingsRepository
+  private val requestPermissionsLauncher =
+    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+      if (permissions.all { it.value }) {
+        startService(Intent(this, ForegroundRecordingService::class.java))
+      } else {
+        Toast.makeText(
+          this,
+          getString(R.string.service_recording_toast),
+          Toast.LENGTH_SHORT
+        ).show()
+        lifecycleScope.launch {
+          repository.setRecordingState(false)
+        }
+      }
+    }
 
+  @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
   @SuppressLint("CoroutineCreationDuringComposition", "Recycle")
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val repository = SettingsRepository(dataStore)
     val app = application as NoteUltraApp
     val vectorUtils = app.vectorUtils
+    repository = SettingsRepository(dataStore)
 
     WindowCompat.setDecorFitsSystemWindows(window, false)
     enableEdgeToEdge()
     setContent {
       val recordingState by repository.recordingStateFlow.collectAsState(repository.recordingStateInitial())
-      val recordingOnBoot by repository.recordingOnBootFlow.collectAsState(repository.recordingOnBootInitial())
       val llmMode by repository.llmModeFlow.collectAsState(repository.llmModeInitial())
       val darkTheme by repository.darkThemeFlow.collectAsState(repository.darkThemeInitial())
 
@@ -121,22 +143,14 @@ class SettingsActivity : ComponentActivity() {
               onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
                   repository.setRecordingState(!recordingState)
+                  initiateRecording(
+                    context,
+                    repository.recordingStateInitial(),
+                    requestPermissionsLauncher
+                  )
                 }
               }
             )
-
-            AnimatedVisibility(recordingState) {
-              SettingItem(
-                title = stringResource(R.string.settings_item_recording_on_boot_title),
-                description = stringResource(R.string.settings_item_recrding_on_boot_description),
-                state = recordingOnBoot,
-                onClick = {
-                  CoroutineScope(Dispatchers.IO).launch {
-                    repository.setRecordingOnBoot(!recordingOnBoot)
-                  }
-                }
-              )
-            }
 
             SettingCategory(stringResource(R.string.settings_category_ai))
 

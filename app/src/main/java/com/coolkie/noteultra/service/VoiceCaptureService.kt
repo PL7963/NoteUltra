@@ -1,14 +1,19 @@
 package com.coolkie.noteultra.service
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.coolkie.noteultra.MainActivity
 import com.coolkie.noteultra.NoteUltraApp
 import com.coolkie.noteultra.R
@@ -48,6 +53,7 @@ class ForegroundRecordingService : Service() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onStartCommand(
         intent: Intent?,
         flags: Int,
@@ -55,10 +61,32 @@ class ForegroundRecordingService : Service() {
     ): Int {
         super.onStartCommand(intent, flags, startId)
 
-        startForeground(1, createNotification())
-        voiceRecognition.startRecording(this)
+        val permissions = arrayOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.FOREGROUND_SERVICE_MICROPHONE,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
 
-        return START_STICKY
+        if (missingPermissions.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    1,
+                    createNotification(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                )
+            } else {
+                startForeground(1, createNotification())
+            }
+            voiceRecognition.startRecording(this)
+
+            return START_STICKY
+        }
+        stopSelf()
+
+        return START_NOT_STICKY
     }
 
     override fun onBind(p0: Intent?): IBinder? {
