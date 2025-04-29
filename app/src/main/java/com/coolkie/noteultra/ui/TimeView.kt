@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -36,7 +36,7 @@ fun TimeView() {
   val coroutineScope = rememberCoroutineScope()
   val initial = remember { mutableStateOf(true) }
   val buttonVisible = remember { mutableStateOf(false) }
-  val offsetX by animateDpAsState(if (buttonVisible.value) -12.dp else 64.dp, label = "offsetX")
+  val offsetX by animateDpAsState(if (buttonVisible.value) (-12).dp else 64.dp, label = "offsetX")
 
   LaunchedEffect(listState.canScrollForward) {
     if (!initial.value) {
@@ -66,7 +66,10 @@ fun TimeView() {
       state = listState,
       contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 40.dp)
     ) {
-      items(itemsList) { item ->
+      itemsIndexed(
+        items = itemsList,
+        key = { index, item -> "$index-${item.hashCode()}" }
+      ) { _, item ->
         Text(item)
         Spacer(modifier = Modifier.height(8.dp))
       }
@@ -80,7 +83,7 @@ fun TimeView() {
       },
       shape = CircleShape,
       modifier = Modifier
-        .offset(offsetX, -52.dp)
+        .offset(offsetX, (-52).dp)
     ) {
       Icon(
         painter = painterResource(id = R.drawable.rounded_arrow_downward_24),
