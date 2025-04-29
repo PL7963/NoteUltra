@@ -73,4 +73,10 @@
     <string name="settings_item_load_on_startup_description">Load the model at app startup. If disabled, it will load when first interacting with the LLM.</string>
     <string name="list_view_summary_placeholder_title">No Saved Summaries</string>
     <string name="list_view_summary_placeholder_description">Tap + to save the AI\'s response as a summary</string>
+    <string name="llm_inference_utils_local_llm_disable_note_content">The model is currently disabled. Please go to settings and select either local or remote mode</string>
+    <string name="llm_inference_utils_local_llm_null_note_title">Model file not found or corrupted</string>
+    <string name="llm_inference_utils_local_llm_null_note_content">Please verify the model path and ensure the model file is accessible</string>
+    <string name="llm_inference_utils_local_llm_disable_note_title">Model is disabled</string>
+    <string name="llm_inference_utils_local_llm_null_question">The model file does not exist or is corrupted. Please check if the path is correct.</string>
+    <string name="llm_inference_utils_local_llm_disable_question">The model has been disabled. Please go to settings and change it to local or remote.</string>
 </resources>

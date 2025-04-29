@@ -1,6 +1,7 @@
 package com.coolkie.noteultra.utils
 
 import android.content.Context
+import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.LlmMode
 import com.coolkie.noteultra.data.SettingsRepository
 import com.coolkie.noteultra.data.dataStore
@@ -11,15 +12,19 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 class LlmInferenceUtils(
-    context: Context,
+    private val context: Context,
     vectorUtils: VectorUtils
 ) {
-    private val llmInference: LlmInference by lazy {
-        val options = LlmInference.LlmInferenceOptions.builder()
-            .setModelPath(localLlmConfig.path)
-            .setMaxTokens(4096)
-            .build()
-        LlmInference.createFromOptions(context, options)
+    private val llmInference: LlmInference? by lazy {
+        try {
+            val options = LlmInference.LlmInferenceOptions.builder()
+                .setModelPath(localLlmConfig.path)
+                .setMaxTokens(4096)
+                .build()
+            LlmInference.createFromOptions(context, options)
+        } catch (e: Exception) {
+            null
+        }
     }
     private val remoteInference: RemoteInferenceUtils by lazy { RemoteInferenceUtils() }
     private val repository = SettingsRepository(context.dataStore)
@@ -89,6 +94,8 @@ class LlmInferenceUtils(
     private fun generateResponse(prompt: PromptUser): String {
         when (llmMode) {
             LlmMode.LOCAL -> {
+                if (llmInference == null) return context.getString(R.string.llm_inference_utils_local_llm_null_question)
+
                 val start = localLlmConfig.startTag
                 val end = localLlmConfig.endTag
 
@@ -105,7 +112,7 @@ class LlmInferenceUtils(
                     append("${start}ASSISTANT:")
                 }
 
-                return llmInference.generateResponse(query.toString())
+                return llmInference!!.generateResponse(query.toString())
             }
 
             LlmMode.REMOTE -> {
@@ -113,7 +120,7 @@ class LlmInferenceUtils(
             }
 
             LlmMode.DISABLE -> {
-                return "LLM_DISABLED"
+                return context.getString(R.string.llm_inference_utils_local_llm_disable_question)
             }
         }
     }
@@ -122,6 +129,11 @@ class LlmInferenceUtils(
     private fun generateResponse(message: String): Array<String> {
         when (llmMode) {
             LlmMode.LOCAL -> {
+                if (llmInference == null) return arrayOf(
+                    context.getString(R.string.llm_inference_utils_local_llm_null_note_title),
+                    context.getString(R.string.llm_inference_utils_local_llm_null_note_content)
+                )
+
                 val start = localLlmConfig.startTag
                 val end = localLlmConfig.endTag
 
@@ -131,7 +143,7 @@ class LlmInferenceUtils(
                     append("${start}USER: $message${end}")
                     append("${start}Title: ")
                 }
-                val title = llmInference.generateResponse(toLlmTitle.toString())
+                val title = llmInference!!.generateResponse(toLlmTitle.toString())
 
                 val promptContent = localLlmConfig.noteContentPrompt
                 val toLlmContent = StringBuilder().apply {
@@ -140,7 +152,7 @@ class LlmInferenceUtils(
                     append("${start}Content: ")
                 }
 
-                val content = llmInference.generateResponse(toLlmContent.toString())
+                val content = llmInference!!.generateResponse(toLlmContent.toString())
 
                 return arrayOf(title, content)
             }
@@ -150,7 +162,10 @@ class LlmInferenceUtils(
             }
 
             LlmMode.DISABLE -> {
-                return arrayOf("LLM_DISABLED", "LLM_DISABLED")
+                return arrayOf(
+                    context.getString(R.string.llm_inference_utils_local_llm_disable_note_title),
+                    context.getString(R.string.llm_inference_utils_local_llm_disable_note_content)
+                )
             }
         }
     }
