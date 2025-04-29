@@ -25,7 +25,7 @@
     <string name="settings_item_llm_settings_title">大型語言模型來源</string>
     <string name="settings_item_llm_settings_description">選擇語言模型來源來決定如何處理文本輸入：本地模型、遠端模型或停用語言模型。</string>
     <string name="settings_category_ai">AI</string>
-    <string name="settings_category_theme">主題</string>
+    <string name="settings_category_display">顯示</string>
     <string name="settings_category_other">其他</string>
     <string name="settings_title">設定</string>
     <string name="settings_back_button">返回</string>
@@ -65,4 +65,8 @@
     <string name="settings_llm_source_confirm_button">設定</string>
     <string name="settings_llm_source_toast_local">請設定本地模型路徑</string>
     <string name="settings_llm_source_toast_remote">請設定遠端模型網址</string>
+    <string name="settings_item_initial_page_title">預設開啟頁面</string>
+    <string name="settings_item_initial_page_description">選擇啟動時顯示的頁面：%1$s</string>
+    <string name="settings_pager_state_notes">筆記</string>
+    <string name="settings_pager_state_transcript">轉錄稿</string>
 </resources>

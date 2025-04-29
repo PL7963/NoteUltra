@@ -36,8 +36,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +51,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
+import com.coolkie.noteultra.data.PagerState
+import com.coolkie.noteultra.data.SettingsRepository
+import com.coolkie.noteultra.data.dataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,11 +62,14 @@ import kotlinx.coroutines.withContext
 @Composable
 @ExperimentalMaterial3Api
 fun MainView() {
-  val llmInstance = LocalLlmInstance.current
   val context = LocalContext.current
+  val llmInstance = LocalLlmInstance.current
+  val repository = SettingsRepository(context.dataStore)
   val drawerState = rememberDrawerState(DrawerValue.Closed)
-  val pagerState = rememberPagerState { 2 }
-  val selectedOption = remember { mutableIntStateOf(0) }
+  val pagerState = rememberPagerState(
+    initialPage = repository.initialPageInitial().ordinal,
+    pageCount = { PagerState.entries.size }
+  )
   val coroutineScope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState(
     bottomSheetState = rememberStandardBottomSheetState(
@@ -81,9 +85,6 @@ fun MainView() {
   val userQueryList = remember { mutableStateListOf<String>() }
   val llmResponseList = remember { mutableStateListOf<String>() }
 
-  LaunchedEffect(pagerState.currentPage) {
-    selectedOption.intValue = pagerState.currentPage
-  }
   ModalNavigationDrawer(
     drawerContent = {
       HistorySheet(drawerState)
@@ -105,7 +106,7 @@ fun MainView() {
           title = {
             SingleChoiceSegmentedButtonRow {
               SegmentedButton(
-                selected = selectedOption.intValue == 0,
+                selected = pagerState.currentPage == 0,
                 onClick = {
                   coroutineScope.launch {
                     launch {
@@ -128,7 +129,7 @@ fun MainView() {
                 )
               }
               SegmentedButton(
-                selected = selectedOption.intValue == 1,
+                selected = pagerState.currentPage == 1,
                 onClick = {
                   coroutineScope.launch {
                     launch {
@@ -283,9 +284,9 @@ fun MainView() {
             modifier = Modifier
               .fillMaxSize()
           ) { page ->
-            when (page) {
-              0 -> ListView()
-              1 -> TimeView()
+            when (PagerState.entries[page]) {
+              PagerState.NOTES -> ListView()
+              PagerState.TRANSCRIPT -> TimeView()
             }
           }
         }

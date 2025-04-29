@@ -49,6 +49,7 @@ import com.coolkie.noteultra.data.LocalLlmConfig
 import com.coolkie.noteultra.data.NoteViewModel
 import com.coolkie.noteultra.data.NoteViewModelFactory
 import com.coolkie.noteultra.data.NotesDatabase
+import com.coolkie.noteultra.data.PagerState
 import com.coolkie.noteultra.data.SettingsRepository
 import com.coolkie.noteultra.data.dataStore
 import com.coolkie.noteultra.service.ForegroundRecordingService
@@ -105,6 +106,7 @@ class SettingsActivity : ComponentActivity() {
       val recordingState by repository.recordingStateFlow.collectAsState(repository.recordingStateInitial())
       val llmMode by repository.llmModeFlow.collectAsState(repository.llmModeInitial())
       val darkTheme by repository.darkThemeFlow.collectAsState(repository.darkThemeInitial())
+      val initialPage by repository.initialPageFlow.collectAsState(repository.initialPageInitial())
 
       NoteUltraTheme {
         val context = LocalContext.current
@@ -432,7 +434,7 @@ class SettingsActivity : ComponentActivity() {
               }
             )
 
-            SettingCategory(stringResource(R.string.settings_category_theme))
+            SettingCategory(stringResource(R.string.settings_category_display))
 
             SettingItemWithDialog(
               title = stringResource(R.string.settings_item_dark_theme_title),
@@ -452,6 +454,34 @@ class SettingsActivity : ComponentActivity() {
                         closeDialog()
                       },
                       text = stringResource(theme.labelResId)
+                    )
+                  }
+                }
+                onDismissRequest { closeDialog() }
+              }
+            )
+
+            SettingItemWithDialog(
+              title = stringResource(R.string.settings_item_initial_page_title),
+              description = stringResource(
+                R.string.settings_item_initial_page_description,
+                stringResource(initialPage.labelResId)
+              ),
+              dialog = {
+                title(stringResource(R.string.settings_item_initial_page_title))
+                content {
+                  PagerState.entries.forEach { page ->
+                    Option(
+                      type = OptionType.RADIO,
+                      isChecked = initialPage == page,
+                      onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                          repository.setInitialPage(page)
+                        }
+
+                        closeDialog()
+                      },
+                      text = stringResource(page.labelResId)
                     )
                   }
                 }

@@ -31,6 +31,11 @@ enum class DarkTheme(@StringRes val labelResId: Int) {
     SYSTEM(R.string.settings_dark_theme_system)
 }
 
+enum class PagerState(@StringRes val labelResId: Int){
+    NOTES(R.string.settings_pager_state_notes),
+    TRANSCRIPT(R.string.settings_pager_state_transcript)
+}
+
 data class LocalLlmConfig(
     val path: String,
     val startTag: String,
@@ -47,6 +52,7 @@ class SettingsRepository(
         val RECORDING_STATE = booleanPreferencesKey("recording_state")
         val LLM_MODE = stringPreferencesKey("llm_mode")
         val DARK_THEME = stringPreferencesKey("dark_theme")
+        val INITIAL_PAGE = stringPreferencesKey("initial_page")
 
         object LocalLLM {
             val PATH = stringPreferencesKey("local_llm_path")
@@ -82,6 +88,10 @@ class SettingsRepository(
 
     private fun Preferences.toDarkTheme(): DarkTheme {
         return DarkTheme.valueOf(this[PreferencesKeys.DARK_THEME] ?: DarkTheme.SYSTEM.name)
+    }
+
+    private fun Preferences.toInitialPage(): PagerState {
+        return PagerState.valueOf(this[PreferencesKeys.INITIAL_PAGE] ?: PagerState.NOTES.name)
     }
 
     private fun Preferences.toLocalLlmConfig(): LocalLlmConfig {
@@ -133,6 +143,16 @@ class SettingsRepository(
         .catchIOException()
         .map { preferences ->
             preferences.toDarkTheme()
+        }
+
+    fun initialPageInitial(): PagerState = runBlocking {
+        dataStore.data.first().toInitialPage()
+    }
+
+    val initialPageFlow: Flow<PagerState> = dataStore.data
+        .catchIOException()
+        .map { preferences ->
+            preferences.toInitialPage()
         }
 
     fun localLlmConfigInitial(): LocalLlmConfig = runBlocking {
@@ -190,6 +210,12 @@ class SettingsRepository(
     suspend fun setDarkTheme(theme: DarkTheme) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.DARK_THEME] = theme.name
+        }
+    }
+
+    suspend fun setInitialPage(page: PagerState) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.INITIAL_PAGE] = page.name
         }
     }
 

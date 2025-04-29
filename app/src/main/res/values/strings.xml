@@ -25,7 +25,7 @@
     <string name="settings_item_llm_settings_title">LLM Source</string>
     <string name="settings_item_llm_settings_description">Select the LLM source to process text inputs: local model, remote model, or disable LLM.</string>
     <string name="settings_category_ai">AI</string>
-    <string name="settings_category_theme">Theme</string>
+    <string name="settings_category_display">Display</string>
     <string name="settings_category_other">Other</string>
     <string name="settings_title">Settings</string>
     <string name="settings_back_button">Back</string>
@@ -65,4 +65,8 @@
     <string name="settings_llm_source_confirm_button">Confirm</string>
     <string name="settings_llm_source_toast_local">Set local model path</string>
     <string name="settings_llm_source_toast_remote">Set remote model URL</string>
+    <string name="settings_item_initial_page_title">Default Startup Page</string>
+    <string name="settings_item_initial_page_description">Choose the default page to open: %1$s</string>
+    <string name="settings_pager_state_notes">Notes</string>
+    <string name="settings_pager_state_transcript">Transcript</string>
 </resources>
