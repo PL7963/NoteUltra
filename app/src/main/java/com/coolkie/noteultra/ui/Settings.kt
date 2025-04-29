@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -182,18 +183,15 @@ class SettingsActivity : ComponentActivity() {
                         )
 
                         if (isDialogShow.value) {
-                          val path =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().path) }
-                          val startTag =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().startTag) }
-                          val endTag =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().endTag) }
-                          val questionPrompt =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().questionPrompt) }
-                          val noteTitlePrompt =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().noteTitlePrompt) }
+                          val initial = repository.localLlmConfigInitial()
+                          val loadOnStartup = remember { mutableStateOf(initial.loadOnStartup) }
+                          val path = remember { mutableStateOf(initial.path) }
+                          val startTag = remember { mutableStateOf(initial.startTag) }
+                          val endTag = remember { mutableStateOf(initial.endTag) }
+                          val questionPrompt = remember { mutableStateOf(initial.questionPrompt) }
+                          val noteTitlePrompt = remember { mutableStateOf(initial.noteTitlePrompt) }
                           val noteContentPrompt =
-                            remember { mutableStateOf(repository.localLlmConfigInitial().noteContentPrompt) }
+                            remember { mutableStateOf(initial.noteContentPrompt) }
 
                           FullScreenDialog(
                             onDismissRequest = { isDialogShow.value = false },
@@ -220,6 +218,7 @@ class SettingsActivity : ComponentActivity() {
                                       coroutineScope.launch {
                                         repository.setLocalLlmConfig(
                                           LocalLlmConfig(
+                                            loadOnStartup = loadOnStartup.value,
                                             path = path.value,
                                             startTag = startTag.value,
                                             endTag = endTag.value,
@@ -229,7 +228,6 @@ class SettingsActivity : ComponentActivity() {
                                           )
                                         )
                                       }
-
                                       isDialogShow.value = false
                                     }
                                   ) {
@@ -243,6 +241,19 @@ class SettingsActivity : ComponentActivity() {
                               modifier = Modifier
                                 .verticalScroll(rememberScrollState())
                             ) {
+                              SettingItem(
+                                title = stringResource(R.string.settings_item_load_on_startup_title),
+                                description = stringResource(R.string.settings_item_load_on_startup_description),
+                                state = loadOnStartup.value,
+                                onClick = {
+                                  loadOnStartup.value = !loadOnStartup.value
+                                }
+                              )
+                              HorizontalDivider(
+                                modifier = Modifier
+                                  .padding(bottom = 8.dp)
+                                  .fillMaxWidth()
+                              )
                               OutlinedTextField(
                                 modifier = Modifier
                                   .padding(vertical = 8.dp, horizontal = 24.dp)
@@ -250,7 +261,13 @@ class SettingsActivity : ComponentActivity() {
                                 value = path.value,
                                 onValueChange = { path.value = it },
                                 label = { Text(stringResource(R.string.settings_local_llm_config_path)) },
-                                maxLines = 1
+                                singleLine = true
+                              )
+                              HorizontalDivider(
+                                modifier = Modifier
+                                  .padding(horizontal = 24.dp)
+                                  .padding(top = 12.dp, bottom = 8.dp)
+                                  .fillMaxWidth()
                               )
                               Row(
                                 modifier = Modifier
@@ -264,7 +281,7 @@ class SettingsActivity : ComponentActivity() {
                                   value = startTag.value,
                                   onValueChange = { startTag.value = it },
                                   label = { Text(stringResource(R.string.settings_local_llm_config_start_tag)) },
-                                  maxLines = 1
+                                  singleLine = true
                                 )
                                 OutlinedTextField(
                                   modifier = Modifier
@@ -272,9 +289,15 @@ class SettingsActivity : ComponentActivity() {
                                   value = endTag.value,
                                   onValueChange = { endTag.value = it },
                                   label = { Text(stringResource(R.string.settings_local_llm_config_end_tag)) },
-                                  maxLines = 1
+                                  singleLine = true
                                 )
                               }
+                              HorizontalDivider(
+                                modifier = Modifier
+                                  .padding(horizontal = 24.dp)
+                                  .padding(top = 12.dp, bottom = 8.dp)
+                                  .fillMaxWidth()
+                              )
                               OutlinedTextField(
                                 modifier = Modifier
                                   .padding(vertical = 8.dp, horizontal = 24.dp)
@@ -364,7 +387,7 @@ class SettingsActivity : ComponentActivity() {
                               value = url.value,
                               onValueChange = { url.value = it },
                               label = { Text(stringResource(R.string.settings_remote_llm_config_url)) },
-                              maxLines = 1
+                              singleLine = true
                             )
                           }
                         }

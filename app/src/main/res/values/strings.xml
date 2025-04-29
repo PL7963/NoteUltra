@@ -69,4 +69,6 @@
     <string name="settings_item_initial_page_description">Choose the default page to open: %1$s</string>
     <string name="settings_pager_state_notes">Notes</string>
     <string name="settings_pager_state_transcript">Transcript</string>
+    <string name="settings_item_load_on_startup_title">Auto-load the model</string>
+    <string name="settings_item_load_on_startup_description">Load the model at app startup. If disabled, it will load when first interacting with the LLM.</string>
 </resources>

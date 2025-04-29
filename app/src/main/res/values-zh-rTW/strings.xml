@@ -69,4 +69,6 @@
     <string name="settings_item_initial_page_description">選擇啟動時顯示的頁面：%1$s</string>
     <string name="settings_pager_state_notes">筆記</string>
     <string name="settings_pager_state_transcript">轉錄稿</string>
+    <string name="settings_item_load_on_startup_title">自動載入模型</string>
+    <string name="settings_item_load_on_startup_description">啟動 App 時自動將模型載入記憶體。若關閉此選項，則會在與 LLM 首次互動時才載入模型。</string>
 </resources>

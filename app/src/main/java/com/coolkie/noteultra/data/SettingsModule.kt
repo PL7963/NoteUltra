@@ -31,12 +31,13 @@ enum class DarkTheme(@StringRes val labelResId: Int) {
     SYSTEM(R.string.settings_dark_theme_system)
 }
 
-enum class PagerState(@StringRes val labelResId: Int){
+enum class PagerState(@StringRes val labelResId: Int) {
     NOTES(R.string.settings_pager_state_notes),
     TRANSCRIPT(R.string.settings_pager_state_transcript)
 }
 
 data class LocalLlmConfig(
+    val loadOnStartup: Boolean,
     val path: String,
     val startTag: String,
     val endTag: String,
@@ -55,6 +56,7 @@ class SettingsRepository(
         val INITIAL_PAGE = stringPreferencesKey("initial_page")
 
         object LocalLLM {
+            val LOAD_ON_STARTUP = booleanPreferencesKey("local_llm_load_on_startup")
             val PATH = stringPreferencesKey("local_llm_path")
             val START_TAG = stringPreferencesKey("local_llm_start_tag")
             val END_TAG = stringPreferencesKey("local_llm_end_tag")
@@ -96,6 +98,8 @@ class SettingsRepository(
 
     private fun Preferences.toLocalLlmConfig(): LocalLlmConfig {
         return LocalLlmConfig(
+            loadOnStartup = this[PreferencesKeys.LocalLLM.LOAD_ON_STARTUP]
+                ?: false,
             path = this[PreferencesKeys.LocalLLM.PATH]
                 ?: "/data/local/tmp/llm/model.bin",
             startTag = this[PreferencesKeys.LocalLLM.START_TAG]
@@ -188,10 +192,9 @@ class SettingsRepository(
         }
     }
 
-    suspend fun setLocalLlmConfig(
-        data: LocalLlmConfig
-    ) {
+    suspend fun setLocalLlmConfig(data: LocalLlmConfig) {
         dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LocalLLM.LOAD_ON_STARTUP] = data.loadOnStartup
             preferences[PreferencesKeys.LocalLLM.PATH] = data.path
             preferences[PreferencesKeys.LocalLLM.START_TAG] = data.startTag
             preferences[PreferencesKeys.LocalLLM.END_TAG] = data.endTag

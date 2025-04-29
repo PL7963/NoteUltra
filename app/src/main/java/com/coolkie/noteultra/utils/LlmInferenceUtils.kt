@@ -52,6 +52,11 @@ class LlmInferenceUtils(
                 remoteLlmConfig = it
             }
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            val llmMode = repository.llmModeInitial() == LlmMode.LOCAL
+            val loadOnStartup = repository.localLlmConfigInitial().loadOnStartup
+            if (llmMode && loadOnStartup) llmInference
+        }
     }
 
     fun answerUserQuestion(
@@ -64,7 +69,8 @@ class LlmInferenceUtils(
         val chatHistory = userQueryLast3.zip(llmResponseLast3) { user, assistant ->
             mapOf(
                 "USER" to user,
-                "ASSISTANT" to assistant)
+                "ASSISTANT" to assistant
+            )
         }
         val prompt = PromptUser(
             question = userQuery,
