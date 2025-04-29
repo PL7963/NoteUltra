@@ -71,4 +71,6 @@
     <string name="settings_pager_state_transcript">Transcript</string>
     <string name="settings_item_load_on_startup_title">Auto-load the model</string>
     <string name="settings_item_load_on_startup_description">Load the model at app startup. If disabled, it will load when first interacting with the LLM.</string>
+    <string name="list_view_summary_placeholder_title">No Saved Summaries</string>
+    <string name="list_view_summary_placeholder_description">Tap + to save the AI\'s response as a summary</string>
 </resources>

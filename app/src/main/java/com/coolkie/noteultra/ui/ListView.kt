@@ -1,7 +1,7 @@
 package com.coolkie.noteultra.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -28,33 +28,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.coolkie.noteultra.R
 import com.coolkie.noteultra.data.Note
 
+@Preview
 @Composable
 fun ListView() {
   val noteViewModel = LocalNoteViewModel.current
   val notes = noteViewModel.noteList.collectAsState().value
 
-  Box(
-    contentAlignment = Alignment.TopStart,
-    modifier = Modifier
-      .fillMaxSize()
-  ) {
+  if (notes.isNotEmpty()) {
     LazyVerticalGrid(
+      modifier = Modifier
+        .fillMaxSize(),
       columns = GridCells.Fixed(2),
       contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 48.dp)
     ) {
       items(notes) { note ->
-        ProduceCard(note)
+        NoteCard(note)
       }
+    }
+  } else {
+    Column(
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+        .fillMaxSize()
+    ) {
+      Icon(
+        painter = painterResource(id = R.drawable.rounded_description_128),
+        contentDescription = stringResource(R.string.list_view_summary_placeholder_title),
+        tint = MaterialTheme.colorScheme.onSurface
+      )
+      Text(
+        text = stringResource(R.string.list_view_summary_placeholder_title),
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onSurface
+      )
+      Text(
+        text = stringResource(R.string.list_view_summary_placeholder_description),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
     }
   }
 }
 
 @Composable
-fun ProduceCard(note: Note) {
+fun NoteCard(note: Note) {
   val noteViewModel = LocalNoteViewModel.current
   val showDialog = remember { mutableStateOf(false) }
 
@@ -103,7 +126,7 @@ fun ProduceCard(note: Note) {
           }
         ) {
           Icon(
-            painter = painterResource(id = R.drawable.rounded_delete_24),
+            painter = painterResource(R.drawable.rounded_delete_24),
             contentDescription = stringResource(R.string.list_view_delete_note_button)
           )
         }
