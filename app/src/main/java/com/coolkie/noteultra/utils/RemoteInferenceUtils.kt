@@ -36,7 +36,7 @@ class RemoteInferenceUtils {
         try {
             client.newCall(request).execute().use { jsonResponse ->
                 val response = Json.decodeFromString<Result>(jsonResponse.body!!.string())
-                return Json.decodeFromString(response.toString())
+                return response
             }
         } catch (e: Exception) {
             Log.e("RemoteInference","ERROR_$e")
