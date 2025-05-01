@@ -42,6 +42,11 @@ fun Chat(
       state = listState,
       contentPadding = PaddingValues(horizontal = 12.dp)
     ) {
+      item {
+        UserQuery("Note Ultra的特點是什麼？")
+        LlmResponse("NoteUltra 是一款結合語音辨識與大型語言模型的智慧記事應用程式，專為無感記錄與自然搜尋而設計。它能自動辨識對話內容並轉為語意向量儲存，用戶只需用自然語言提問，就能快速搜尋並獲得相關對話資訊。支援純地端與混合雲運算，兼顧效能與隱私安全。介面遵循 Material 3 設計，支援無障礙操作，簡單易用。特別適合學生、職場人士與重視資訊隱私的使用者，是日常記錄與回顧的重要輔助工具。", isButtonEnable)
+      }
+
       itemsIndexed(userQueryList) { index, userQuery ->
         UserQuery(userQuery)
         llmResponseList.getOrNull(index)?.let {
