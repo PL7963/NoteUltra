@@ -35,7 +35,7 @@ class RemoteInferenceUtils {
 
         try {
             client.newCall(request).execute().use { jsonResponse ->
-                val response = Json.decodeFromString<Result>(jsonResponse.body!!.string())
+                val response: String = Json.decodeFromString<Result>(jsonResponse.body!!.string())
                 return response
             }
         } catch (e: Exception) {
@@ -55,7 +55,7 @@ class RemoteInferenceUtils {
 
         try {
             client.newCall(request).execute().use { jsonResponse ->
-                val response = Json.decodeFromString<SummaryResult>(jsonResponse.body!!.string())
+                val response: String = Json.decodeFromString<SummaryResult>(jsonResponse.body!!.string())
                 return arrayOf(response.title, response.summary)
             }
         } catch (e: Exception) {
