@@ -14,12 +14,12 @@
 - **Material You**: NoteUltra uses Material 3 design from Google. It provides an accessible and personalized experience.
 
 ## Requirement:
-OS: Android 13+
-RAM: 2GB+(12GB recommended for on-device inferencing.)
-CPU: Snapdragon 855+
+OS: Android 13+  
+RAM: 2GB+(12GB recommended for on-device inferencing.)  
+CPU: Snapdragon 855+  
 
 ## How to use my own LLM model?
-To reduce package size, NoteUltra does not include the LLM model by default. You can download the Gemma 2B model from Kaggle or any other model in TFLite format. Currently, the app can only read models from /tmp. You may need to use Shizuku or adb to access this directory. 
+To reduce package size, NoteUltra does not include the LLM model by default. You can download the Gemma 2B model from Kaggle or any other model in TFLite format. Currently, the app can only read models from /tmp. You may need MT File Manager or Android Studio file explorer to access this directory.
 You may also host your own LLM inference node by following the documentation [here](https://github.com/PL7963/NoteUltra/wiki/Remote-Inference-server).
 
 ## Special Thanks to: 
