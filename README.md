@@ -10,8 +10,8 @@
 * **Effortless**: You no longer need to write everything down. NoteUltra listens to audio from around you and transcribes it to text actively.  
 * **Intuitive**: Simply ask questions to AI. No more searching, no more guessing.  
 * **Privacy first**: All the data is secured locally on your device, and all the data can be processed on the device.  
-- **Your assistant, Your choices**: NoteUltra provides a wide variety of customizations, including prompts for LLM and the models of LLM. NoteUltra even provides a standard API that allows you to use your own self-hosted LLM inference server.  
-- **Material You**: NoteUltra uses Material 3 design from Google. It provides an accessible and personalized experience.
+* **Your assistant, Your choices**: NoteUltra provides a wide variety of customizations, including prompts for LLM and the models of LLM. NoteUltra even provides a standard API that allows you to use your own self-hosted LLM inference server.  
+* **Material You**: NoteUltra uses Material 3 design from Google. It provides an accessible and personalized experience.
 
 ## Requirement:
 OS: Android 13+  
