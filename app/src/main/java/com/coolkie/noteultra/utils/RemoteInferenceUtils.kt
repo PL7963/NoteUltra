@@ -15,7 +15,7 @@ class RemoteInferenceUtils {
 
     @Serializable
     data class Result(
-        val response: String
+        val result: String
     )
 
     @Serializable
@@ -35,7 +35,7 @@ class RemoteInferenceUtils {
 
         try {
             client.newCall(request).execute().use { jsonResponse ->
-                val response = Json.decodeFromString<Result>(jsonResponse.body!!.string()).response
+                val response = Json.decodeFromString<Result>(jsonResponse.body!!.string()).result
                 return response
             }
         } catch (e: Exception) {
