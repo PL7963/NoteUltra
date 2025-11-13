@@ -24,10 +24,13 @@ class RemoteInferenceUtils {
         val summary: String
     )
 
+    @Serializable
+    data class Context(
+        val context: String
+    )
     /* For question */
     fun generateResponse(prompt: PromptUser, url: String): String {
         val body = Json.encodeToString(prompt)
-
         val request = Request.Builder()
             .url("${url}/question")
             .post(body.toRequestBody("application/json".toMediaType()))
@@ -46,7 +49,8 @@ class RemoteInferenceUtils {
 
     /* For summary */
     fun generateResponse(context: String, url: String): Array<String> {
-        val body = Json.encodeToString(context)
+        val to_json_context = Context(context)
+        val body = Json.encodeToString(to_json_context)
 
         val request = Request.Builder()
             .url("${url}/summary")
